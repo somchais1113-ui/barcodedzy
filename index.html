@@ -3,16 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ITF-14 Label Preview</title>
+  <title>ITF-14 Product Label Generator</title>
   <style>
     :root {
-      --bg: #f3f4f6;
+      --bg: #edf4ff;
       --panel: #ffffff;
       --ink: #111827;
-      --muted: #6b7280;
-      --line: #d1d5db;
-      --brand: #111827;
-      --radius: 18px;
+      --muted: #667085;
+      --line: #d5deeb;
+      --line-strong: #b6c4d8;
+      --brand: #0f172a;
+      --soft: #f8fbff;
+      --ok-bg: #e9fff1;
+      --ok-line: #8ce3ad;
+      --ok-ink: #057a3d;
+      --bad-bg: #fff1f2;
+      --bad-line: #fda4af;
+      --bad-ink: #be123c;
+      --radius: 22px;
     }
 
     * { box-sizing: border-box; }
@@ -20,61 +28,103 @@
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at top left, #dcecff 0, transparent 32rem),
+        var(--bg);
       color: var(--ink);
       padding: 24px;
     }
 
     .app {
-      max-width: 1180px;
+      max-width: 1280px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 410px 1fr;
       gap: 20px;
       align-items: start;
     }
 
-    .panel {
-      background: var(--panel);
+    .panel,
+    .preview-panel {
+      background: rgba(255, 255, 255, .96);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
+      box-shadow: 0 18px 48px rgba(15, 23, 42, .10);
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .preview-panel {
+      padding: 22px;
+      position: sticky;
+      top: 16px;
     }
 
     h1 {
-      font-size: 22px;
-      margin: 0 0 6px;
+      margin: 0 0 8px;
+      font-size: 26px;
+      line-height: 1.15;
+      letter-spacing: -.04em;
     }
 
-    .hint {
+    h2 {
+      margin: 0 0 16px;
+      font-size: 22px;
+      letter-spacing: -.03em;
+    }
+
+    .intro {
       margin: 0 0 18px;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.55;
+      line-height: 1.6;
+    }
+
+    .guide {
+      margin: 0 0 18px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: var(--ok-bg);
+      border: 1px solid var(--ok-line);
+      color: var(--ok-ink);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .section-title {
+      margin: 20px 0 10px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #111827;
     }
 
     label {
       display: block;
-      margin: 12px 0 5px;
+      margin: 12px 0 6px;
+      color: #253044;
       font-size: 12px;
-      color: #374151;
-      font-weight: 700;
+      font-weight: 850;
     }
 
-    input, select {
+    input,
+    select {
       width: 100%;
       border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px 11px;
+      border-radius: 14px;
+      padding: 11px 12px;
       font-size: 14px;
-      outline: none;
+      color: var(--ink);
       background: #fff;
+      outline: none;
+      transition: border-color .16s ease, box-shadow .16s ease;
     }
 
-    input:focus, select:focus {
-      border-color: #111827;
-      box-shadow: 0 0 0 3px rgba(17, 24, 39, .10);
+    input:focus,
+    select:focus {
+      border-color: #1f2937;
+      box-shadow: 0 0 0 4px rgba(15, 23, 42, .09);
     }
 
     .row {
@@ -83,57 +133,137 @@
       gap: 10px;
     }
 
-    .status {
-      margin-top: 14px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: #f9fafb;
-      border: 1px solid var(--line);
-      font-size: 13px;
-      line-height: 1.45;
+    .inline {
+      display: flex;
+      gap: 10px;
+      align-items: end;
     }
 
-    .status strong { display: block; margin-bottom: 2px; }
+    .inline > div { flex: 1; }
 
-    .preview-wrap {
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 15px;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--brand);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .btn.secondary {
+      background: #e8eef8;
+      color: #172033;
+    }
+
+    .btn.ghost {
       background: #fff;
+      color: #172033;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 22px;
-      overflow: auto;
-      box-shadow: 0 14px 35px rgba(15, 23, 42, .08);
-    }
-
-    #label-container {
-      width: min(920px, 100%);
-      margin: 0 auto;
     }
 
     .actions {
       display: flex;
-      gap: 8px;
-      margin-top: 14px;
       flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 16px;
     }
 
-    button {
-      border: 0;
-      border-radius: 999px;
-      background: var(--brand);
-      color: white;
-      padding: 10px 14px;
-      font-weight: 800;
-      cursor: pointer;
+    .status {
+      margin-top: 14px;
+      padding: 12px 13px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
     }
 
-    button.secondary {
-      background: #e5e7eb;
-      color: #111827;
+    .status.ok {
+      border-color: var(--ok-line);
+      background: var(--ok-bg);
+      color: var(--ok-ink);
     }
 
-    @media (max-width: 900px) {
+    .status.bad {
+      border-color: var(--bad-line);
+      background: var(--bad-bg);
+      color: var(--bad-ink);
+    }
+
+    .status strong {
+      display: block;
+      color: inherit;
+      margin-bottom: 2px;
+    }
+
+    .preview-stage {
+      border: 1px dashed var(--line-strong);
+      border-radius: 22px;
+      padding: 56px 24px;
+      min-height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      overflow: auto;
+    }
+
+    #label-container {
+      width: min(880px, 100%);
+      min-width: 560px;
+    }
+
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .panel,
+      .preview-panel h2,
+      .note {
+        display: none !important;
+      }
+
+      .app {
+        display: block;
+        max-width: none;
+      }
+
+      .preview-panel {
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+        position: static;
+      }
+
+      .preview-stage {
+        border: 0;
+        padding: 0;
+        min-height: 0;
+      }
+
+      #label-container {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 980px) {
       body { padding: 14px; }
       .app { grid-template-columns: 1fr; }
+      .preview-panel { position: static; }
+      #label-container { min-width: 520px; }
     }
   </style>
 </head>
@@ -141,84 +271,115 @@
   <main class="app">
     <section class="panel">
       <h1>ITF-14 Label Generator</h1>
-      <p class="hint">
-        ใช้ไฟล์เดียวจบ ไม่แยก CSS/JS และยังคง layout SVG เดิมไว้
-        โดยเพิ่ม GTIN Level สำหรับสร้าง ITF-14: Lv3 หรือ Lv4
+      <p class="intro">
+        แบบไฟล์เดียวจบ ไม่แยก CSS/JS และ Preview เป็น Label เต็มใบตาม SVG layout เดิม:
+        ชื่อสินค้า, ชื่ออังกฤษ, ชื่อไทย, GTIN ด้านบน, ITF-14, LOCATION, QTY, G.W. และ LOT NO.
       </p>
 
-      <label for="title">Title</label>
-      <input id="title" value="QTM M5 ROCKY ASST BLUE (SET 4DM+BTL)" />
+      <div class="guide">เริ่มตรงนี้: กรอกข้อมูลสินค้า → เลือก GTIN Level → ดู Preview ด้านขวา</div>
 
-      <label for="subtitle">Subtitle</label>
-      <input id="subtitle" value="QUANTUM M5 ROCKY ASST BLUE (SET 4DM+BTL)" />
+      <div class="section-title">ข้อมูลสินค้า</div>
 
-      <label for="thaiName">Thai name</label>
-      <input id="thaiName" value="ควอนตั้มปากกา M5 ร็อคกี้ น้ำเงินคละสี(4DM+BTL)" />
+      <label for="title">ชื่อสินค้าบรรทัดใหญ่</label>
+      <input id="title" value="QTM GELVOLUTION 007 HITZ" />
 
-      <div class="row">
+      <label for="subtitle">ชื่อสินค้าอังกฤษ</label>
+      <input id="subtitle" value="QUANTUM GELVOLUTION 007 HITZ ASST BLUE 0.7 MM (DM)" />
+
+      <label for="thaiName">ชื่อสินค้าไทย</label>
+      <input id="thaiName" value="ควอนตั้มเจลโวลูชั่น 007 ฮิทซ์น้ำเงินคละสี (DM)" />
+
+      <div class="section-title">ข้อมูล GTIN / Barcode</div>
+
+      <label for="gtin13">GTIN-13 / EAN-13 สินค้าเดี่ยว</label>
+      <div class="inline">
         <div>
-          <label for="unitGtin13">GTIN-13 สินค้าเดี่ยว</label>
-          <input id="unitGtin13" value="8851907342685" inputmode="numeric" />
+          <input id="gtin13" value="8851907346492" inputmode="numeric" />
         </div>
-        <div>
-          <label for="qty">QTY</label>
-          <input id="qty" value="4" inputmode="numeric" />
-        </div>
+        <button class="btn secondary" type="button" onclick="loadSample()">ตัวอย่าง</button>
       </div>
 
       <div class="row">
         <div>
           <label for="gtinLevel">GTIN Level / Indicator</label>
           <select id="gtinLevel">
-            <option value="3" selected>GTIN Lv3 / Indicator 3</option>
-            <option value="4">GTIN Lv4 / Indicator 4</option>
+            <option value="3" selected>Lv3 / Indicator 3</option>
+            <option value="4">Lv4 / Indicator 4</option>
           </select>
         </div>
+        <div>
+          <label for="qty">QTY</label>
+          <input id="qty" value="20" inputmode="numeric" />
+        </div>
+      </div>
+
+      <label for="manualItf14">ITF-14 ด้านล่าง ถ้ามีเลขจริงจากระบบ ให้ใส่ช่องนี้</label>
+      <input id="manualItf14" value="38851907345397" inputmode="numeric" />
+      <p class="note">
+        ถ้าช่องนี้ว่าง ระบบจะสร้าง ITF-14 จาก GTIN-13 + Level ให้อัตโนมัติ
+        แต่ถ้าบริษัทมีเลข GTIN Lv3/Lv4 จริงอยู่แล้ว ให้ใส่เลข 14 หลักในช่องนี้เพื่อให้ Preview ตรงระบบ
+      </p>
+
+      <div class="section-title">ข้อมูลตาราง</div>
+
+      <div class="row">
         <div>
           <label for="location">LOCATION</label>
           <input id="location" value="IND" />
         </div>
-      </div>
-
-      <div class="row">
         <div>
           <label for="grossWeight">G.W.(Kg)</label>
-          <input id="grossWeight" value="1.25" />
-        </div>
-        <div>
-          <label for="lotNo">LOT NO.</label>
-          <input id="lotNo" value="LOT2026" />
+          <input id="grossWeight" value="" placeholder="เช่น 1.25" />
         </div>
       </div>
+
+      <label for="lotNo">LOT NO.</label>
+      <input id="lotNo" value="" placeholder="เช่น LOT2026" />
 
       <div class="actions">
-        <button type="button" onclick="downloadSVG()">Download SVG</button>
-        <button type="button" class="secondary" onclick="window.print()">Print</button>
+        <button class="btn" type="button" onclick="downloadSVG()">Download SVG</button>
+        <button class="btn secondary" type="button" onclick="copySVG()">Copy SVG</button>
+        <button class="btn ghost" type="button" onclick="window.print()">Print</button>
       </div>
 
-      <div class="status" id="status"></div>
+      <div id="status" class="status"></div>
     </section>
 
-    <section class="preview-wrap">
-      <div id="label-container"></div>
+    <section class="preview-panel">
+      <h2>Preview</h2>
+      <div class="preview-stage">
+        <div id="label-container"></div>
+      </div>
+      <p class="note">
+        Preview นี้ render เป็น SVG ทั้งใบ ไม่ใช่บาร์โค้ดอย่างเดียว และยังคงตำแหน่ง layout เดิมจากโค้ดต้นฉบับ
+      </p>
     </section>
   </main>
 
   <script>
-    const labelData = {
-      title: "QTM M5 ROCKY ASST BLUE (SET 4DM+BTL)",
-      subtitle: "QUANTUM M5 ROCKY ASST BLUE (SET 4DM+BTL)",
-      thaiName: "ควอนตั้มปากกา M5 ร็อคกี้ น้ำเงินคละสี(4DM+BTL)",
-      unitGtin13: "8851907342685",
+    const sampleData = {
+      title: "QTM GELVOLUTION 007 HITZ",
+      subtitle: "QUANTUM GELVOLUTION 007 HITZ ASST BLUE 0.7 MM (DM)",
+      thaiName: "ควอนตั้มเจลโวลูชั่น 007 ฮิทซ์น้ำเงินคละสี (DM)",
+      gtin13: "8851907346492",
       gtinLevel: "3",
+      manualItf14: "38851907345397",
       location: "IND",
-      qty: "4",
-      grossWeight: "1.25",
-      lotNo: "LOT2026"
+      qty: "20",
+      grossWeight: "",
+      lotNo: ""
     };
 
     function onlyDigits(value) {
       return String(value || "").replace(/\D/g, "");
+    }
+
+    function escapeText(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
     }
 
     function calcGtinCheckDigit(withoutCheckDigit) {
@@ -233,35 +394,55 @@
       return String((10 - (sum % 10)) % 10);
     }
 
-    function isValidGtin(value, expectedLength) {
+    function isValidGtin(value, length) {
       const digits = onlyDigits(value);
-      if (digits.length !== expectedLength) return false;
-
-      const body = digits.slice(0, -1);
-      const check = digits.slice(-1);
-      return calcGtinCheckDigit(body) === check;
+      if (digits.length !== length) return false;
+      return calcGtinCheckDigit(digits.slice(0, -1)) === digits.slice(-1);
     }
 
-    function buildITF14(unitGtin13, gtinLevel) {
-      const unit = onlyDigits(unitGtin13);
-      const level = onlyDigits(gtinLevel).slice(0, 1);
-
-      if (!/^[0-9]$/.test(level)) {
-        throw new Error("GTIN Level ต้องเป็นตัวเลข 0-9");
-      }
+    function buildITF14FromGTIN13(gtin13, level) {
+      const unit = onlyDigits(gtin13);
+      const indicator = onlyDigits(level).slice(0, 1);
 
       if (unit.length !== 13) {
-        throw new Error("GTIN-13 ต้องมี 13 หลัก เช่น 8851907342685");
+        throw new Error("GTIN-13 ต้องมี 13 หลัก");
       }
 
       if (!isValidGtin(unit, 13)) {
-        throw new Error("GTIN-13 check digit ไม่ถูกต้อง กรุณาตรวจเลขสินค้าเดี่ยว");
+        throw new Error("GTIN-13 check digit ไม่ถูกต้อง");
       }
 
-      // ITF-14 ใช้ packaging indicator 1 หลัก + GTIN-13 ที่ตัด check digit เดิมออก 12 หลัก
-      // แล้วคำนวณ check digit ใหม่ของ GTIN-14
-      const body13 = level + unit.slice(0, 12);
-      return body13 + calcGtinCheckDigit(body13);
+      if (!/^[0-9]$/.test(indicator)) {
+        throw new Error("GTIN Level / Indicator ต้องเป็นตัวเลข 0-9");
+      }
+
+      const body = indicator + unit.slice(0, 12);
+      return body + calcGtinCheckDigit(body);
+    }
+
+    function getITF14(data) {
+      const manual = onlyDigits(data.manualItf14);
+
+      if (manual) {
+        if (manual.length !== 14) {
+          throw new Error("ITF-14 ที่ใส่เองต้องมี 14 หลัก");
+        }
+
+        // ไม่ block งานทันทีถ้า check digit ไม่ตรง เพราะบางองค์กรมี master data เดิม
+        // แต่จะแจ้งเตือนใน status แทน
+        return {
+          value: manual,
+          source: "manual",
+          valid: isValidGtin(manual, 14)
+        };
+      }
+
+      const generated = buildITF14FromGTIN13(data.gtin13, data.gtinLevel);
+      return {
+        value: generated,
+        source: "generated",
+        valid: true
+      };
     }
 
     function encodeITF14Rects(value, options = {}) {
@@ -269,10 +450,6 @@
 
       if (digits.length !== 14) {
         throw new Error("ITF-14 ต้องมี 14 หลัก");
-      }
-
-      if (!isValidGtin(digits, 14)) {
-        throw new Error("ITF-14 check digit ไม่ถูกต้อง");
       }
 
       const patterns = {
@@ -288,19 +465,20 @@
         "9": "nwnwn"
       };
 
-      const x = options.x ?? 24.5;
-      const y = options.y ?? 47.8;
-      const height = options.height ?? 16;
-      const maxWidth = options.width ?? 123;
-      const wideRatio = options.wideRatio ?? 2.5;
+      // ตำแหน่งนี้อิง layout SVG เดิมในไฟล์ที่คุณส่งมา
+      const x = options.x ?? 25.2;
+      const y = options.y ?? 48.3;
+      const height = options.height ?? 14.9;
+      const maxWidth = options.width ?? 121.9;
+      const wideRatio = options.wideRatio ?? 2.55;
 
       const sequence = [];
 
       function addBar(size) { sequence.push({ type: "bar", size }); }
       function addSpace(size) { sequence.push({ type: "space", size }); }
-      function moduleSize(char) { return char === "w" ? wideRatio : 1; }
+      function sizeOf(char) { return char === "w" ? wideRatio : 1; }
 
-      // Start pattern: narrow bar, narrow space, narrow bar, narrow space
+      // ITF start
       addBar(1); addSpace(1); addBar(1); addSpace(1);
 
       for (let i = 0; i < digits.length; i += 2) {
@@ -308,22 +486,22 @@
         const spacePattern = patterns[digits[i + 1]];
 
         for (let j = 0; j < 5; j++) {
-          addBar(moduleSize(barPattern[j]));
-          addSpace(moduleSize(spacePattern[j]));
+          addBar(sizeOf(barPattern[j]));
+          addSpace(sizeOf(spacePattern[j]));
         }
       }
 
-      // Stop pattern: wide bar, narrow space, narrow bar
+      // ITF stop
       addBar(wideRatio); addSpace(1); addBar(1);
 
       const totalUnits = sequence.reduce((sum, item) => sum + item.size, 0);
-      const unitWidth = maxWidth / totalUnits;
+      const unit = maxWidth / totalUnits;
 
       let cursor = x;
       let rects = "";
 
       for (const item of sequence) {
-        const width = item.size * unitWidth;
+        const width = item.size * unit;
         if (item.type === "bar") {
           rects += `<rect class="black" x="${cursor.toFixed(2)}" y="${y}" width="${width.toFixed(2)}" height="${height}"/>`;
         }
@@ -333,21 +511,14 @@
       return rects;
     }
 
-    function escapeText(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
-    }
-
     function collectData() {
       return {
         title: document.getElementById("title").value,
         subtitle: document.getElementById("subtitle").value,
         thaiName: document.getElementById("thaiName").value,
-        unitGtin13: document.getElementById("unitGtin13").value,
+        gtin13: document.getElementById("gtin13").value,
         gtinLevel: document.getElementById("gtinLevel").value,
+        manualItf14: document.getElementById("manualItf14").value,
         location: document.getElementById("location").value,
         qty: document.getElementById("qty").value,
         grossWeight: document.getElementById("grossWeight").value,
@@ -357,28 +528,25 @@
 
     function renderLabel(data) {
       const status = document.getElementById("status");
-
-      let itf14 = "";
+      let itf = { value: "", source: "manual", valid: true };
       let barcodeRects = "";
 
       try {
-        itf14 = buildITF14(data.unitGtin13, data.gtinLevel);
-        barcodeRects = encodeITF14Rects(itf14);
+        itf = getITF14(data);
+        barcodeRects = encodeITF14Rects(itf.value);
 
-        status.innerHTML = `
-          <strong>พร้อมใช้งาน</strong>
-          GTIN Lv${escapeText(data.gtinLevel)} / ITF-14: ${escapeText(itf14)}
-        `;
+        status.className = itf.valid ? "status ok" : "status bad";
+        status.innerHTML = itf.valid
+          ? `<strong>Preview พร้อมใช้งาน</strong>ITF-14: ${escapeText(itf.value)} (${itf.source === "manual" ? "ใช้เลขที่ใส่เอง" : "สร้างจาก GTIN-13 + Lv" + escapeText(data.gtinLevel)})`
+          : `<strong>Preview แสดงได้ แต่ควรตรวจสอบ</strong>ITF-14: ${escapeText(itf.value)} มี check digit ไม่ตรงตามสูตร GTIN`;
       } catch (error) {
-        itf14 = "ERROR";
+        status.className = "status bad";
+        status.innerHTML = `<strong>ตรวจสอบข้อมูล</strong>${escapeText(error.message)}`;
+        itf.value = "00000000000000";
         barcodeRects = "";
-        status.innerHTML = `
-          <strong>ตรวจสอบข้อมูล</strong>
-          ${escapeText(error.message)}
-        `;
       }
 
-      const barcodeTop = `${onlyDigits(data.unitGtin13)} x ${escapeText(data.qty)}`;
+      const topBarcodeText = `${onlyDigits(data.gtin13)} x ${escapeText(data.qty)}`;
 
       document.getElementById("label-container").innerHTML = `
         <svg id="label-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172.54 123.01" width="100%" height="auto">
@@ -443,19 +611,19 @@
           <text class="thai" transform="translate(14.45 35.62)">${escapeText(data.thaiName)}</text>
 
           <!-- ตัวเลขด้านบนบาร์โค้ด -->
-          <text class="top-barcode-text" transform="translate(104.6 44.26)">${barcodeTop}</text>
+          <text class="top-barcode-text" transform="translate(104.6 44.26)">${topBarcodeText}</text>
 
           <!-- กรอบบาร์โค้ด -->
           <path class="black" d="M164.4,66.05H8.14v-19.16h156.26v19.16ZM9.5,64.74h153.55v-16.53H9.5v16.53Z"/>
 
-          <!-- แท่งบาร์โค้ด ITF-14 แบบ dynamic แต่คงตำแหน่ง layout เดิม -->
+          <!-- แท่งบาร์โค้ด ITF-14 -->
           <g>
             <rect class="white" x="14.17" y="35.46" width="143.53" height="68.82"/>
             ${barcodeRects}
           </g>
 
           <!-- เลขบาร์โค้ด -->
-          <text class="barcode-text" transform="translate(7.49 74.88)">${escapeText(itf14)}</text>
+          <text class="barcode-text" transform="translate(7.49 74.88)">${escapeText(itf.value)}</text>
 
           <!-- หัวตาราง -->
           <text class="small" transform="translate(9.8 84.61) scale(1.04 1)">LOCATION</text>
@@ -482,28 +650,57 @@
       renderLabel(collectData());
     }
 
-    function downloadSVG() {
-      const svg = document.getElementById("label-svg");
-      if (!svg) return;
+    function loadSample() {
+      for (const [key, value] of Object.entries(sampleData)) {
+        const el = document.getElementById(key);
+        if (el) el.value = value;
+      }
+      update();
+    }
 
-      const source = new XMLSerializer().serializeToString(svg);
+    function getSVGSource() {
+      const svg = document.getElementById("label-svg");
+      if (!svg) return "";
+      return new XMLSerializer().serializeToString(svg);
+    }
+
+    function downloadSVG() {
+      const source = getSVGSource();
+      if (!source) return;
+
       const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = "itf14-label.svg";
+      link.download = "itf14-product-label.svg";
       link.click();
 
       URL.revokeObjectURL(url);
     }
 
-    document.querySelectorAll("input, select").forEach((field) => {
-      field.addEventListener("input", update);
-      field.addEventListener("change", update);
+    async function copySVG() {
+      const source = getSVGSource();
+      if (!source) return;
+
+      try {
+        await navigator.clipboard.writeText(source);
+        const status = document.getElementById("status");
+        status.className = "status ok";
+        status.innerHTML = "<strong>คัดลอก SVG แล้ว</strong>นำไปวางในไฟล์หรือโปรแกรมออกแบบต่อได้เลย";
+      } catch (error) {
+        const status = document.getElementById("status");
+        status.className = "status bad";
+        status.innerHTML = "<strong>คัดลอกไม่สำเร็จ</strong>Browser นี้อาจไม่อนุญาต clipboard ให้ใช้ Download SVG แทน";
+      }
+    }
+
+    document.querySelectorAll("input, select").forEach((el) => {
+      el.addEventListener("input", update);
+      el.addEventListener("change", update);
     });
 
-    renderLabel(labelData);
+    loadSample();
   </script>
 </body>
 </html>
