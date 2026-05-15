@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Barcode Studio - เครื่องมือสร้างบาร์โค้ดสินค้าแบบ static สำหรับ GitHub Pages">
+  <meta name="theme-color" content="#111827">
+  <title>Barcode Studio | สร้างบาร์โค้ดสินค้า</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#generator">ข้ามไปยังเครื่องมือสร้างบาร์โค้ด</a>
+
+  <header class="site-header">
+    <nav class="nav" aria-label="เมนูหลัก">
+      <a class="brand" href="./" aria-label="Barcode Studio Home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Barcode Studio</span>
+      </a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="สลับโหมดสี">
+        <span aria-hidden="true">◐</span>
+        <span class="theme-toggle-text">Theme</span>
+      </button>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Static • GitHub Pages ready • No backend</p>
+        <h1>สร้างบาร์โค้ดสินค้าแบบเร็ว สวย และแชร์ให้ทีมใช้ได้ทันที</h1>
+        <p class="hero-lead">
+          รองรับบาร์โค้ดที่ใช้บ่อยในงานสินค้า เช่น EAN-13, EAN-8, UPC-A, CODE128, CODE39, ITF และ ITF-14
+          พร้อมดาวน์โหลดเป็น SVG หรือ PNG ได้จากหน้าเว็บเดียว
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#generator">เริ่มสร้างบาร์โค้ด</a>
+          <a class="button button-secondary" href="#batch">สร้างหลายรหัสพร้อมกัน</a>
+        </div>
+      </div>
+      <div class="hero-card" aria-label="ตัวอย่างบาร์โค้ด">
+        <div class="mini-window">
+          <span></span><span></span><span></span>
+        </div>
+        <svg id="heroBarcode" role="img" aria-label="ตัวอย่าง Barcode Studio"></svg>
+        <p>ตัวอย่าง: CODE128 สำหรับ SKU ภายในร้าน</p>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="feature-grid" aria-label="จุดเด่น">
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">01</span>
+        <h2>เหมาะกับ GitHub</h2>
+        <p>เป็นเว็บ static เปิดไฟล์ได้ทันที หรือเอาขึ้น GitHub Pages โดยไม่ต้องมี server และไม่เก็บข้อมูลผู้ใช้</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">02</span>
+        <h2>เช็คเลขสินค้าให้อัตโนมัติ</h2>
+        <p>EAN/UPC/ITF-14 สามารถคำนวณหรือแจ้งเตือน check digit ได้ ลดความผิดพลาดก่อนนำไปพิมพ์</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">03</span>
+        <h2>ดาวน์โหลดง่าย</h2>
+        <p>ส่งออกเป็น SVG สำหรับงานออกแบบ หรือ PNG สำหรับเอกสารทั่วไป และพิมพ์จากเบราว์เซอร์ได้</p>
+      </article>
+    </section>
+
+    <section class="workspace" id="generator">
+      <div class="panel controls-panel">
+        <div class="panel-heading">
+          <p class="eyebrow">Generator</p>
+          <h2>ตั้งค่าบาร์โค้ด</h2>
+        </div>
+
+        <form id="barcodeForm" class="form" autocomplete="off">
+          <div class="field">
+            <label for="format">ประเภทบาร์โค้ด</label>
+            <select id="format" name="format">
+              <option value="EAN13">EAN-13 / GTIN-13 สำหรับสินค้าขายปลีก</option>
+              <option value="EAN8">EAN-8 สำหรับสินค้าขนาดเล็ก</option>
+              <option value="UPC">UPC-A สำหรับสินค้าตลาดสหรัฐฯ</option>
+              <option value="CODE128" selected>CODE128 สำหรับ SKU / รหัสคลังสินค้า</option>
+              <option value="CODE39">CODE39 สำหรับรหัสตัวอักษรพื้นฐาน</option>
+              <option value="ITF14">ITF-14 / GTIN-14 สำหรับกล่องลัง</option>
+              <option value="ITF">ITF / Interleaved 2 of 5</option>
+            </select>
+            <small id="formatHelp">CODE128 รองรับตัวอักษร ตัวเลข และสัญลักษณ์ เหมาะกับ SKU ภายในร้าน</small>
+          </div>
+
+          <div class="field">
+            <label for="barcodeValue">รหัสสินค้า / ข้อความ</label>
+            <div class="input-row">
+              <input id="barcodeValue" name="barcodeValue" type="text" value="SKU-TH-0001" spellcheck="false" inputmode="text" required>
+              <button class="button button-ghost" id="sampleButton" type="button">ตัวอย่าง</button>
+            </div>
+            <small id="validationMessage" class="validation-message" role="status" aria-live="polite"></small>
+          </div>
+
+          <details class="settings" open>
+            <summary>ตั้งค่าการแสดงผล</summary>
+            <div class="settings-grid">
+              <label class="setting-field">
+                <span>ความหนาเส้น</span>
+                <input id="barWidth" type="range" min="1" max="5" step="0.5" value="2">
+                <output id="barWidthValue">2</output>
+              </label>
+              <label class="setting-field">
+                <span>ความสูง</span>
+                <input id="barHeight" type="range" min="40" max="180" step="5" value="96">
+                <output id="barHeightValue">96</output>
+              </label>
+              <label class="setting-field">
+                <span>ระยะขอบ</span>
+                <input id="barMargin" type="range" min="0" max="40" step="1" value="12">
+                <output id="barMarginValue">12</output>
+              </label>
+              <label class="setting-field">
+                <span>ขนาดตัวเลข</span>
+                <input id="fontSize" type="range" min="10" max="28" step="1" value="18">
+                <output id="fontSizeValue">18</output>
+              </label>
+              <label class="setting-field color-field">
+                <span>สีเส้น</span>
+                <input id="lineColor" type="color" value="#111827">
+              </label>
+              <label class="setting-field color-field">
+                <span>สีพื้นหลัง</span>
+                <input id="backgroundColor" type="color" value="#ffffff">
+              </label>
+              <label class="checkbox-field">
+                <input id="displayValue" type="checkbox" checked>
+                <span>แสดงตัวเลขใต้บาร์โค้ด</span>
+              </label>
+            </div>
+          </details>
+        </form>
+      </div>
+
+      <div class="panel preview-panel">
+        <div class="panel-heading preview-heading">
+          <div>
+            <p class="eyebrow">Preview</p>
+            <h2>ตัวอย่างก่อนดาวน์โหลด</h2>
+          </div>
+          <span class="status-pill" id="statusPill">Ready</span>
+        </div>
+
+        <div class="preview-stage" id="previewStage">
+          <svg id="barcode" role="img" aria-label="Generated barcode"></svg>
+        </div>
+
+        <div class="meta-list" aria-label="ข้อมูลบาร์โค้ด">
+          <div>
+            <span>Format</span>
+            <strong id="metaFormat">CODE128</strong>
+          </div>
+          <div>
+            <span>Value</span>
+            <strong id="metaValue">SKU-TH-0001</strong>
+          </div>
+        </div>
+
+        <div class="action-grid">
+          <button class="button button-primary" id="downloadSvg" type="button">ดาวน์โหลด SVG</button>
+          <button class="button button-secondary" id="downloadPng" type="button">ดาวน์โหลด PNG</button>
+          <button class="button button-secondary" id="copySvg" type="button">คัดลอก SVG</button>
+          <button class="button button-ghost" id="printBarcode" type="button">พิมพ์</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="batch panel" id="batch">
+      <div class="panel-heading">
+        <p class="eyebrow">Batch</p>
+        <h2>สร้างหลายรหัสพร้อมกัน</h2>
+        <p>ใส่หนึ่งรหัสต่อหนึ่งบรรทัด ระบบจะใช้ประเภทและค่าการแสดงผลเดียวกับด้านบน</p>
+      </div>
+      <div class="batch-layout">
+        <div class="field">
+          <label for="batchInput">รายการรหัส</label>
+          <textarea id="batchInput" rows="8" spellcheck="false">SKU-TH-0001
+SKU-TH-0002
+SKU-TH-0003</textarea>
+          <div class="batch-actions">
+            <button class="button button-primary" id="generateBatch" type="button">สร้างรายการ</button>
+            <button class="button button-secondary" id="clearBatch" type="button">ล้างรายการ</button>
+          </div>
+        </div>
+        <div class="batch-result" id="batchResult" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="guide-grid" aria-label="คำแนะนำการเลือกประเภทบาร์โค้ด">
+      <article class="guide-card">
+        <h2>เลือกประเภทไหนดี?</h2>
+        <p><strong>EAN-13</strong> เหมาะกับสินค้าขายปลีกที่มี GTIN, <strong>UPC-A</strong> ใช้บ่อยในตลาดสหรัฐฯ, <strong>CODE128</strong> เหมาะกับ SKU ภายในร้านหรือคลังสินค้า</p>
+      </article>
+      <article class="guide-card">
+        <h2>ข้อควรระวังก่อนใช้งานจริง</h2>
+        <p>ถ้าจะใช้บาร์โค้ดบนสินค้าที่ขายผ่านค้าปลีกจริง ควรตรวจสอบเลข GTIN/UPC กับหน่วยงานหรือระบบที่เกี่ยวข้องก่อนพิมพ์จำนวนมาก</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Barcode Studio เป็นตัวอย่างโปรเจกต์ static สำหรับแชร์บน GitHub. Generated barcodes run locally in your browser.</p>
+  </footer>
+
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
