@@ -56,9 +56,7 @@
       box-shadow: 0 18px 48px rgba(15, 23, 42, .10);
     }
 
-    .panel {
-      padding: 22px;
-    }
+    .panel { padding: 22px; }
 
     .preview-panel {
       padding: 22px;
@@ -113,7 +111,8 @@
     }
 
     input,
-    select {
+    select,
+    textarea {
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -125,8 +124,19 @@
       transition: border-color .16s ease, box-shadow .16s ease;
     }
 
+    textarea {
+      min-height: 118px;
+      resize: vertical;
+      line-height: 1.45;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: auto;
+    }
+
     input:focus,
-    select:focus {
+    select:focus,
+    textarea:focus {
       border-color: #1f2937;
       box-shadow: 0 0 0 4px rgba(15, 23, 42, .09);
     }
@@ -174,6 +184,68 @@
       margin-top: 16px;
     }
 
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .mode-btn {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 13px 14px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-weight: 900;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .mode-btn span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+
+    .mode-btn.active {
+      border-color: #111827;
+      background: #f2f6ff;
+      box-shadow: 0 0 0 4px rgba(15, 23, 42, .08);
+    }
+
+    .hidden { display: none !important; }
+
+    .batch-card {
+      padding: 12px;
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fbfdff;
+    }
+
+    .batch-card-title {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 950;
+      color: #172033;
+    }
+
+    .batch-counts {
+      margin-top: 10px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
     .status {
       margin-top: 14px;
       padding: 12px 13px;
@@ -203,6 +275,52 @@
       margin-bottom: 2px;
     }
 
+    .preview-toolbar {
+      display: none;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin: -6px 0 12px;
+      flex-wrap: wrap;
+    }
+
+    .preview-toolbar.active { display: flex; }
+
+    .preview-counter {
+      font-size: 13px;
+      font-weight: 900;
+      color: #172033;
+      line-height: 1.45;
+    }
+
+    .mini-actions,
+    .page-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .page-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .mini-btn {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #fff;
+      color: #172033;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .mini-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
     .preview-stage {
       border: 1px dashed var(--line-strong);
       border-radius: 22px;
@@ -220,6 +338,46 @@
       min-width: 560px;
     }
 
+    .thumbs {
+      display: none;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 2px 2px;
+      margin-top: 12px;
+    }
+
+    .thumbs.active { display: flex; }
+
+    .thumb-btn {
+      min-width: 142px;
+      max-width: 170px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 9px 10px;
+      cursor: pointer;
+      text-align: left;
+      color: #172033;
+      font-weight: 900;
+      overflow: hidden;
+    }
+
+    .thumb-btn span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+      font-weight: 750;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .thumb-btn.active {
+      border-color: #111827;
+      background: #f2f6ff;
+    }
+
     .note {
       margin-top: 14px;
       color: var(--muted);
@@ -228,7 +386,6 @@
     }
 
     @page {
-      /* Export page = label size + 30mm margin on every side */
       size: 232.54mm 183.01mm;
       margin: 0;
     }
@@ -242,12 +399,12 @@
         padding: 0;
         margin: 0;
         overflow: hidden;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
       }
 
       .panel,
       .preview-panel h2,
+      .preview-toolbar,
+      .thumbs,
       .note {
         display: none !important;
       }
@@ -295,6 +452,7 @@
       .app { grid-template-columns: 1fr; }
       .preview-panel { position: static; }
       #label-container { min-width: 520px; }
+      .mode-grid, .row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -306,8 +464,22 @@
         กดสร้างรัว ๆ ก็ไม่มีกระตุก เพราะนี่คือ Barcodedzy. ระบบรีดประสิทธิภาพลาเบลสินค้าแบบ Single-File ส่งออกรูปภาพ PNG/JPG คมชัดทันใจ เลย์เอาต์ 3 บรรทัดกึ่งกลางเป๊ะทุกพิกเซล พร้อมเคลียร์พื้นหลังและเว้นระยะ Margin บาร์โค้ดขั้นเทพ ยิงมุมไหนก็ติด
       </p>
 
-      <div class="guide">เริ่มตรงนี้: กรอกข้อมูลสินค้า → เลือก GTIN Level → ดู Preview ด้านขวา</div>
+      <div class="guide">เริ่มตรงนี้: เลือกวิธีสร้าง Label → กรอกข้อมูลสินค้า → เลือก GTIN Level → ดู Preview ด้านขวา</div>
 
+      <div class="section-title">เลือกวิธีสร้าง Label</div>
+      <p class="note">เลือกสร้าง Label ใบเดียวสำหรับงานเร็ว หรือสร้างหลายใบแบบวางข้อมูลแยกตามช่อง แล้ว Export เป็น ZIP รูปภาพ</p>
+      <div class="mode-grid" role="group" aria-label="เลือกวิธีสร้าง Label">
+        <button id="singleModeBtn" class="mode-btn active" type="button" onclick="setMode('single')">
+          สร้างใบเดียว
+          <span>Export PNG / JPG / PDF / SVG ตามปกติ</span>
+        </button>
+        <button id="batchModeBtn" class="mode-btn" type="button" onclick="setMode('batch')">
+          สร้างหลายใบ
+          <span>วางหลายชื่อ / หลาย GTIN / หลาย ITF-14 แยกตามช่อง</span>
+        </button>
+      </div>
+
+      <div id="singleFormSection">
       <div class="section-title">ข้อมูลสินค้า</div>
 
       <label for="title">ชื่อสินค้าบรรทัดใหญ่</label>
@@ -337,7 +509,7 @@
             <option value="4">Lv4 / Indicator 4</option>
           </select>
         </div>
-        <div>
+        <div id="singleQtyField">
           <label for="qty">QTY</label>
           <input id="qty" value="20" inputmode="numeric" />
         </div>
@@ -383,11 +555,67 @@
       <label for="lotNo">LOT NO.</label>
       <input id="lotNo" value="" placeholder="เช่น LOT2026" />
 
-      <div class="actions">
+      </div>
+
+      <div id="batchSection" class="hidden">
+        <div class="section-title">ข้อมูลหลายรายการแบบแยกช่อง</div>
+        <p class="note">วางข้อมูลจาก Excel / Google Sheets ทีละคอลัมน์ได้เลย ระบบจะจับคู่ตามลำดับบรรทัด ถ้าช่องไหนมีค่าเดียวจะใช้ค่านั้นกับทุกใบ ถ้าช่องไหนว่างจะใช้ค่าจากฟอร์มใบเดียว</p>
+
+        <div class="batch-card">
+          <p class="batch-card-title">1. ชื่อสินค้า</p>
+          <label for="batchTitleList">ชื่อสินค้าบรรทัดใหญ่ หลายรายการ</label>
+          <textarea id="batchTitleList" placeholder="วางชื่อสินค้าบรรทัดใหญ่ ทีละบรรทัด"></textarea>
+
+          <label for="batchSubtitleList">ชื่อสินค้าอังกฤษ หลายรายการ</label>
+          <textarea id="batchSubtitleList" placeholder="วางชื่อสินค้าอังกฤษ ทีละบรรทัด"></textarea>
+
+          <label for="batchThaiNameList">ชื่อสินค้าไทย หลายรายการ</label>
+          <textarea id="batchThaiNameList" placeholder="วางชื่อสินค้าไทย ทีละบรรทัด"></textarea>
+        </div>
+
+        <div class="batch-card">
+          <p class="batch-card-title">2. Barcode</p>
+          <label for="batchGtin13List">GTIN-13 / EAN-13 หลายรายการ</label>
+          <textarea id="batchGtin13List" placeholder="วาง GTIN-13 ทีละบรรทัด"></textarea>
+
+
+          <label for="batchItf14List">ITF-14 Manual หลายรายการ</label>
+          <textarea id="batchItf14List" placeholder="วาง ITF-14 ทีละบรรทัด ถ้าเว้นว่าง ระบบจะ derive จาก GTIN-13 + Level"></textarea>
+        </div>
+
+        <div class="batch-card">
+          <p class="batch-card-title">3. จำนวนและตาราง</p>
+          <label for="batchLocationList">LOCATION หลายรายการ</label>
+          <textarea id="batchLocationList" placeholder="เช่น CHN หรือวางหลายบรรทัด"></textarea>
+
+          <label for="batchQtyList">QTY หลายรายการ</label>
+          <textarea id="batchQtyList" placeholder="วาง QTY ทีละบรรทัด เช่น&#10;144&#10;144&#10;120"></textarea>
+
+          <label for="batchGrossWeightList">G.W.(Kg) หลายรายการ</label>
+          <textarea id="batchGrossWeightList" placeholder="วาง G.W. ทีละบรรทัด หรือเว้นว่าง"></textarea>
+
+          <label for="batchLotNoList">LOT NO. หลายรายการ</label>
+          <textarea id="batchLotNoList" placeholder="วาง LOT NO. ทีละบรรทัด หรือเว้นว่าง"></textarea>
+        </div>
+
+        <div class="actions">
+          <button class="btn secondary" type="button" onclick="fillBatchFromCurrentForm()">ใช้ข้อมูลฟอร์มนี้เป็นตัวอย่าง</button>
+          <button class="btn ghost" type="button" onclick="loadBatchSample()">ตัวอย่างหลายสินค้า</button>
+        </div>
+        <div id="batchCounts" class="batch-counts">ยังไม่ได้ใส่ข้อมูลหลายรายการ</div>
+        <p id="batchSummary" class="note">ระบบจะแสดงและ Export ทีละชุด ชุดละ 10 รายการ เพื่อลดอาการหน่วงเวลาใช้งานจริง</p>
+      </div>
+
+      <div id="singleActions" class="actions">
         <button class="btn" type="button" onclick="downloadPNGPreview()">Export PNG Preview</button>
         <button class="btn" type="button" onclick="downloadJPGPreview()">Export JPG Preview</button>
         <button class="btn ghost" type="button" onclick="exportSupplierPDF()">Export Supplier PDF</button>
         <button class="btn ghost" type="button" onclick="downloadEditableSVG()">Export SVG Editable</button>
+      </div>
+
+      <div id="batchActions" class="actions hidden">
+        <button class="btn" type="button" onclick="downloadBatchZip('png')">Export PNG ZIP ชุดนี้</button>
+        <button class="btn" type="button" onclick="downloadBatchZip('jpg')">Export JPG ZIP ชุดนี้</button>
       </div>
 
       <div id="status" class="status"></div>
@@ -395,16 +623,39 @@
 
     <section class="preview-panel">
       <h2>Preview</h2>
+      <div id="previewToolbar" class="preview-toolbar">
+        <div id="previewCounter" class="preview-counter">Preview 1 / 1</div>
+        <div class="mini-actions">
+          <button id="prevBatchBtn" class="mini-btn" type="button" onclick="prevBatchItem()">ก่อนหน้า</button>
+          <button id="nextBatchBtn" class="mini-btn" type="button" onclick="nextBatchItem()">ถัดไป</button>
+        </div>
+        <div class="page-actions">
+          <button id="prevBatchPageBtn" class="mini-btn" type="button" onclick="prevBatchPage()">ก่อนหน้า 10 รายการ</button>
+          <button id="nextBatchPageBtn" class="mini-btn" type="button" onclick="nextBatchPage()">ถัดไป 10 รายการ</button>
+        </div>
+      </div>
       <div class="preview-stage">
         <div id="label-container"></div>
       </div>
+      <div id="batchThumbs" class="thumbs"></div>
       <p class="note">
-        Preview แสดงเป็น SVG บนหน้าเว็บโดยตรง ปุ่ม Export Supplier PDF จะเปิดหน้าพิมพ์เพื่อ Save as PDF เป็นไฟล์ final สำหรับส่ง Supplier
+        Preview แสดงเป็น SVG บนหน้าเว็บโดยตรง โหมดสร้างหลายใบจะแสดงทีละใบพร้อม thumbnail และ Export เป็น ZIP รูปภาพเฉพาะชุดที่กำลังดู
       </p>
     </section>
   </main>
 
   <script>
+    const LABEL_WIDTH_MM = 172.54;
+    const LABEL_HEIGHT_MM = 123.01;
+    const EXPORT_MARGIN_MM = 30;
+    const EXPORT_WIDTH_MM = LABEL_WIDTH_MM + EXPORT_MARGIN_MM * 2;
+    const EXPORT_HEIGHT_MM = LABEL_HEIGHT_MM + EXPORT_MARGIN_MM * 2;
+    const BATCH_PAGE_SIZE = 10;
+
+    let currentMode = "single";
+    let batchIndex = 0;
+    let currentBatchPage = 0;
+
     const sampleData = {
       title: "QTM GELVOLUTION 007 HITZ",
       subtitle: "QUANTUM GELVOLUTION 007 HITZ ASST BLUE 0.7 MM (DM)",
@@ -418,11 +669,17 @@
       lotNo: ""
     };
 
-    const LABEL_WIDTH_MM = 172.54;
-    const LABEL_HEIGHT_MM = 123.01;
-    const EXPORT_MARGIN_MM = 30;
-    const EXPORT_WIDTH_MM = LABEL_WIDTH_MM + EXPORT_MARGIN_MM * 2;
-    const EXPORT_HEIGHT_MM = LABEL_HEIGHT_MM + EXPORT_MARGIN_MM * 2;
+    const batchSampleData = {
+      batchTitleList: "QTM WHITEBOARD MARKER\nQTM GELVOLUTION 007 HITZ\nQTM BALL PEN",
+      batchSubtitleList: "QTM WHITEBOARD MARKER BLUE\nQUANTUM GELVOLUTION 007 HITZ ASST BLUE 0.7 MM (DM)\nQTM BALL PEN 0.5 MM BLACK",
+      batchThaiNameList: "ควอนตั้มไวท์บอร์ดมาร์กเกอร์น้ำเงิน\nควอนตั้มเจลโวลูชั่น 007 ฮิทซ์น้ำเงินคละสี (DM)\nควอนตั้มปากกาลูกลื่น 0.5 มม. ดำ",
+      batchGtin13List: "8851907344221\n8851907346492\n8851907000000",
+      batchItf14List: "48851907344229\n38851907345397\n48851907000008",
+      batchLocationList: "CHN",
+      batchQtyList: "144\n20\n60",
+      batchGrossWeightList: "",
+      batchLotNoList: ""
+    };
 
     function onlyDigits(value) {
       return String(value || "").replace(/\D/g, "");
@@ -446,30 +703,12 @@
         .slice(0, 120) || "Product";
     }
 
-    function makeExportFileBaseName() {
-      const data = collectData();
-      let itfValue = onlyDigits(data.manualItf14);
-
-      if (itfValue.length !== 14) {
-        try {
-          itfValue = getITF14(data).value;
-        } catch (error) {
-          itfValue = "00000000000000";
-        }
-      }
-
-      return `Gtin_Lv${sanitizeFileNamePart(data.gtinLevel)}_${sanitizeFileNamePart(data.subtitle)}_ITF14_${itfValue}`;
-    }
-
     function calcGtinCheckDigit(withoutCheckDigit) {
       const digits = onlyDigits(withoutCheckDigit);
       let sum = 0;
-
       for (let i = digits.length - 1, position = 0; i >= 0; i--, position++) {
-        const n = Number(digits[i]);
-        sum += n * (position % 2 === 0 ? 3 : 1);
+        sum += Number(digits[i]) * (position % 2 === 0 ? 3 : 1);
       }
-
       return String((10 - (sum % 10)) % 10);
     }
 
@@ -482,103 +721,72 @@
     function buildITF14FromGTIN13(gtin13, level) {
       const unit = onlyDigits(gtin13);
       const indicator = onlyDigits(level).slice(0, 1);
-
-      if (unit.length !== 13) {
-        throw new Error("GTIN-13 ต้องมี 13 หลัก");
-      }
-
-      if (!isValidGtin(unit, 13)) {
-        throw new Error("GTIN-13 check digit ไม่ถูกต้อง");
-      }
-
-      if (!/^[0-9]$/.test(indicator)) {
-        throw new Error("GTIN Level / Indicator ต้องเป็นตัวเลข 0-9");
-      }
-
+      if (unit.length !== 13) throw new Error("GTIN-13 ต้องมี 13 หลัก");
+      if (!isValidGtin(unit, 13)) throw new Error("GTIN-13 check digit ไม่ถูกต้อง");
+      if (!/^[0-9]$/.test(indicator)) throw new Error("GTIN Level / Indicator ต้องเป็นตัวเลข 0-9");
       const body = indicator + unit.slice(0, 12);
       return body + calcGtinCheckDigit(body);
     }
 
     function getITF14(data) {
       const manual = onlyDigits(data.manualItf14);
-
       if (manual) {
-        if (manual.length !== 14) {
-          throw new Error("ITF-14 ที่ใส่เองต้องมี 14 หลัก");
-        }
-
-        // ไม่ block งานทันทีถ้า check digit ไม่ตรง เพราะบางองค์กรมี master data เดิม
-        // แต่จะแจ้งเตือนใน status แทน
-        return {
-          value: manual,
-          source: "manual",
-          valid: isValidGtin(manual, 14)
-        };
+        if (manual.length !== 14) throw new Error("ITF-14 ที่ใส่เองต้องมี 14 หลัก");
+        return { value: manual, source: "manual", valid: isValidGtin(manual, 14) };
       }
-
       const generated = buildITF14FromGTIN13(data.gtin13, data.gtinLevel);
-      return {
-        value: generated,
-        source: "generated",
-        valid: true
-      };
+      return { value: generated, source: "generated", valid: true };
+    }
+
+    function makeExportFileBaseName(sourceData) {
+      const data = sourceData || collectData();
+      let itfValue = onlyDigits(data.manualItf14);
+      if (itfValue.length !== 14) {
+        try { itfValue = getITF14(data).value; }
+        catch (error) { itfValue = "00000000000000"; }
+      }
+      return `Gtin_Lv${sanitizeFileNamePart(data.gtinLevel)}_${sanitizeFileNamePart(data.subtitle)}_ITF14_${itfValue}`;
+    }
+
+    function makeBatchZipFileName(firstItem, startIndex, endIndex, count, extension) {
+      const data = firstItem || collectData();
+      const level = sanitizeFileNamePart(data.gtinLevel || collectData().gtinLevel);
+      const englishName = sanitizeFileNamePart(data.subtitle || collectData().subtitle);
+      const startText = String(startIndex + 1).padStart(3, "0");
+      const endText = String(endIndex).padStart(3, "0");
+      return `SC-BARCODEDZY_BKK_101_VER-1_Gtin_Lv${level}_${englishName}_${startText}-${endText}_x${count}_${extension}.zip`;
     }
 
     function encodeITF14Rects(value, options = {}) {
       const digits = onlyDigits(value);
-
-      if (digits.length !== 14) {
-        throw new Error("ITF-14 ต้องมี 14 หลัก");
-      }
-
+      if (digits.length !== 14) throw new Error("ITF-14 ต้องมี 14 หลัก");
       const patterns = {
-        "0": "nnwwn",
-        "1": "wnnnw",
-        "2": "nwnnw",
-        "3": "wwnnn",
-        "4": "nnwnw",
-        "5": "wnwnn",
-        "6": "nwwnn",
-        "7": "nnnww",
-        "8": "wnnwn",
-        "9": "nwnwn"
+        "0": "nnwwn", "1": "wnnnw", "2": "nwnnw", "3": "wwnnn", "4": "nnwnw",
+        "5": "wnwnn", "6": "nwwnn", "7": "nnnww", "8": "wnnwn", "9": "nwnwn"
       };
-
-      // ตำแหน่งนี้อิง layout SVG เดิมในไฟล์ที่คุณส่งมา
       const x = options.x ?? 24.5;
       const y = options.y ?? 48.21;
       const height = options.height ?? 16.53;
       const maxWidth = options.width ?? 123.55;
       const wideRatio = options.wideRatio ?? 2.55;
-
       const sequence = [];
-
-      function addBar(size) { sequence.push({ type: "bar", size }); }
-      function addSpace(size) { sequence.push({ type: "space", size }); }
-      function sizeOf(char) { return char === "w" ? wideRatio : 1; }
-
-      // ITF start
+      const addBar = (size) => sequence.push({ type: "bar", size });
+      const addSpace = (size) => sequence.push({ type: "space", size });
+      const sizeOf = (char) => char === "w" ? wideRatio : 1;
       addBar(1); addSpace(1); addBar(1); addSpace(1);
-
       for (let i = 0; i < digits.length; i += 2) {
         const barPattern = patterns[digits[i]];
         const spacePattern = patterns[digits[i + 1]];
-
         for (let j = 0; j < 5; j++) {
           addBar(sizeOf(barPattern[j]));
           addSpace(sizeOf(spacePattern[j]));
         }
       }
-
-      // ITF stop
       addBar(wideRatio); addSpace(1); addBar(1);
-
       const totalUnits = sequence.reduce((sum, item) => sum + item.size, 0);
       const unit = maxWidth / totalUnits;
-
       let cursor = x;
       let rects = "";
-
       for (const item of sequence) {
         const width = item.size * unit;
         if (item.type === "bar") {
@@ -586,172 +794,321 @@
         }
         cursor += width;
       }
-
       return rects;
+    }
+
+    function byId(id) {
+      return document.getElementById(id);
     }
 
     function collectData() {
       return {
-        title: document.getElementById("title").value,
-        subtitle: document.getElementById("subtitle").value,
-        thaiName: document.getElementById("thaiName").value,
-        gtin13: document.getElementById("gtin13").value,
-        gtinLevel: document.getElementById("gtinLevel").value,
-        manualItf14: document.getElementById("manualItf14").value,
-        location: document.getElementById("location").value,
-        qty: document.getElementById("qty").value,
-        grossWeight: document.getElementById("grossWeight").value,
-        lotNo: document.getElementById("lotNo").value
+        title: byId("title").value,
+        subtitle: byId("subtitle").value,
+        thaiName: byId("thaiName").value,
+        gtin13: byId("gtin13").value,
+        gtinLevel: byId("gtinLevel").value,
+        manualItf14: byId("manualItf14").value,
+        location: byId("location").value,
+        qty: byId("qty").value,
+        grossWeight: byId("grossWeight").value,
+        lotNo: byId("lotNo").value
       };
     }
 
-    function renderLabel(data) {
-      const status = document.getElementById("status");
+    function getTextLines(id) {
+      const raw = byId(id).value.replace(/\r/g, "");
+      if (!raw.trim()) return [];
+      const lines = raw.split("\n").map((line) => line.trim());
+      while (lines.length && !lines[lines.length - 1]) lines.pop();
+      return lines;
+    }
+
+    function getBatchLists() {
+      return {
+        title: getTextLines("batchTitleList"),
+        subtitle: getTextLines("batchSubtitleList"),
+        thaiName: getTextLines("batchThaiNameList"),
+        gtin13: getTextLines("batchGtin13List"),
+        manualItf14: getTextLines("batchItf14List"),
+        location: getTextLines("batchLocationList"),
+        qty: getTextLines("batchQtyList"),
+        grossWeight: getTextLines("batchGrossWeightList"),
+        lotNo: getTextLines("batchLotNoList")
+      };
+    }
+
+    function valueForLine(lines, index, fallback) {
+      if (!lines.length) return fallback;
+      if (lines.length === 1) return lines[0] || fallback;
+      return lines[index] || fallback;
+    }
+
+    function parseBatchItems() {
+      const defaults = collectData();
+      const lists = getBatchLists();
+      const total = Math.max(1, ...Object.values(lists).map((list) => list.length));
+      const items = [];
+      for (let i = 0; i < total; i++) {
+        items.push({
+          title: valueForLine(lists.title, i, defaults.title),
+          subtitle: valueForLine(lists.subtitle, i, defaults.subtitle),
+          thaiName: valueForLine(lists.thaiName, i, defaults.thaiName),
+          gtin13: valueForLine(lists.gtin13, i, defaults.gtin13),
+          gtinLevel: defaults.gtinLevel,
+          manualItf14: valueForLine(lists.manualItf14, i, defaults.manualItf14),
+          location: valueForLine(lists.location, i, defaults.location),
+          qty: valueForLine(lists.qty, i, defaults.qty),
+          grossWeight: valueForLine(lists.grossWeight, i, defaults.grossWeight),
+          lotNo: valueForLine(lists.lotNo, i, defaults.lotNo)
+        });
+      }
+      return { items, lists };
+    }
+
+    function getVisibleBatchRange(total) {
+      const pageCount = Math.max(1, Math.ceil(total / BATCH_PAGE_SIZE));
+      if (currentBatchPage >= pageCount) currentBatchPage = pageCount - 1;
+      if (currentBatchPage < 0) currentBatchPage = 0;
+      const start = currentBatchPage * BATCH_PAGE_SIZE;
+      const end = Math.min(start + BATCH_PAGE_SIZE, total);
+      return { start, end, pageCount };
+    }
+
+    function getPreviewData() {
+      if (currentMode !== "batch") return collectData();
+      const { items } = parseBatchItems();
+      if (batchIndex >= items.length) batchIndex = items.length - 1;
+      if (batchIndex < 0) batchIndex = 0;
+      return items[batchIndex] || collectData();
+    }
+
+    function renderLabel(data, options = {}) {
+      const updateStatus = options.updateStatus !== false;
+      const status = byId("status");
       let itf = { value: "", source: "manual", valid: true };
       let barcodeRects = "";
-
       try {
         itf = getITF14(data);
         barcodeRects = encodeITF14Rects(itf.value);
-
-        status.className = itf.valid ? "status ok" : "status bad";
-        status.innerHTML = itf.valid
-          ? `<strong>Preview พร้อมใช้งาน</strong>ITF-14: ${escapeText(itf.value)} (${itf.source === "manual" ? "ใช้เลขที่ใส่เอง" : "สร้างจาก GTIN-13 + Lv" + escapeText(data.gtinLevel)})`
-          : `<strong>Preview แสดงได้ แต่ควรตรวจสอบ</strong>ITF-14: ${escapeText(itf.value)} มี check digit ไม่ตรงตามสูตร GTIN`;
+        if (updateStatus) {
+          status.className = itf.valid ? "status ok" : "status bad";
+          status.innerHTML = itf.valid
+            ? `<strong>Preview พร้อมใช้งาน</strong>ITF-14: ${escapeText(itf.value)} (${itf.source === "manual" ? "ใช้เลขที่ใส่เอง" : "สร้างจาก GTIN-13 + Lv" + escapeText(data.gtinLevel)})`
+            : `<strong>Preview แสดงได้ แต่ควรตรวจสอบ</strong>ITF-14: ${escapeText(itf.value)} มี check digit ไม่ตรงตามสูตร GTIN`;
+        }
       } catch (error) {
-        status.className = "status bad";
-        status.innerHTML = `<strong>ตรวจสอบข้อมูล</strong>${escapeText(error.message)}`;
+        if (updateStatus) {
+          status.className = "status bad";
+          status.innerHTML = `<strong>ตรวจสอบข้อมูล</strong>${escapeText(error.message)}`;
+        }
         itf.value = "00000000000000";
         barcodeRects = "";
       }
 
       const topBarcodeText = `${onlyDigits(data.gtin13)} x ${escapeText(data.qty)}`;
-
-      document.getElementById("label-container").innerHTML = `
+      byId("label-container").innerHTML = `
         <svg id="label-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172.54 123.01" width="100%" height="auto">
           <defs>
             <style>
               .black { fill: #231f20; }
               .white { fill: #fff; }
-
-              .title,
-              .subtitle,
-              .thai,
-              .bold-small,
-              .barcode-text {
+              .title, .subtitle, .thai, .bold-small, .barcode-text {
                 fill: #231f20;
                 font-family: "Angsana New", "Times New Roman", serif;
                 font-weight: 700;
               }
-
-              .title {
-                font-size: 22.16px;
-                letter-spacing: -.02em;
-              }
-
-              .subtitle {
-                font-size: 10.5px;
-                letter-spacing: -.02em;
-              }
-
-              .thai {
-                font-size: 9.75px;
-              }
-
+              .title { font-size: 22.16px; letter-spacing: -.02em; }
+              .subtitle { font-size: 10.5px; letter-spacing: -.02em; }
+              .thai { font-size: 9.75px; }
               .small {
                 fill: #231f20;
                 font-family: "Angsana New", "Times New Roman", serif;
                 font-size: 11.45px;
               }
-
-              .bold-small {
-                font-size: 11.45px;
-              }
-
-              .barcode-text {
-                font-size: 13.5px;
-                letter-spacing: .05em;
-              }
-
+              .bold-small { font-size: 11.45px; }
+              .barcode-text { font-size: 13.5px; letter-spacing: .05em; }
               .top-barcode-text {
                 fill: #231f20;
                 font-family: "Angsana New", "Times New Roman", serif;
                 font-size: 11.25px;
+                text-anchor: end;
               }
-
-              .center-title,
-              .center-subtitle,
-              .center-thai {
+              .center-title, .center-subtitle, .center-thai {
                 text-anchor: middle;
                 dominant-baseline: alphabetic;
               }
-
-              .table-value {
-                text-anchor: middle;
-                dominant-baseline: middle;
-              }
+              .table-value { text-anchor: middle; }
             </style>
           </defs>
-
-          <!-- กรอบนอก -->
           <path class="black" d="M172.54,100.17H0V.95h172.54v99.21ZM.76,99.42h171.02V1.7H.76v97.72Z"/>
-
-          <!-- ชื่อสินค้า: จัดกึ่งกลางทั้ง 3 บรรทัด และบีบความกว้างด้วย textLength เพื่อไม่ให้ล้นกรอบ -->
           <text class="title center-title" x="86.27" y="15.92" textLength="155" lengthAdjust="spacingAndGlyphs">${escapeText(data.title)}</text>
           <text class="subtitle center-subtitle" x="86.27" y="25.56" textLength="152" lengthAdjust="spacingAndGlyphs">${escapeText(data.subtitle)}</text>
           <text class="thai center-thai" x="86.27" y="35.62" textLength="135" lengthAdjust="spacingAndGlyphs">${escapeText(data.thaiName)}</text>
-
-          <!-- ตัวเลขด้านบนบาร์โค้ด -->
-          <text class="top-barcode-text" x="148.05" y="44.26" text-anchor="end">${topBarcodeText}</text>
-
-          <!-- กรอบบาร์โค้ด -->
+          <text class="top-barcode-text" x="148.05" y="44.26">${topBarcodeText}</text>
           <path class="black" d="M164.4,66.05H8.14v-19.16h156.26v19.16ZM9.5,64.74h153.55v-16.53H9.5v16.53Z"/>
-
-          <!-- แท่งบาร์โค้ด ITF-14: ไม่มีพื้นหลังสีขาว และเว้น quiet zone ซ้าย-ขวาภายในกรอบเพิ่มขึ้นประมาณข้างละ 1 cm x=24.5 y=48.21 w=123.55 h=16.53 -->
-          <g id="barcode-bars">
-            ${barcodeRects}
-          </g>
-
-          <!-- เลขบาร์โค้ด -->
+          <g id="barcode-bars">${barcodeRects}</g>
           <text class="barcode-text" transform="translate(7.49 74.88)">${escapeText(itf.value)}</text>
-
-          <!-- หัวตาราง -->
           <text class="small" transform="translate(9.8 84.61) scale(1.04 1)">LOCATION</text>
           <text class="small" transform="translate(56.81 84.39) scale(1.04 1)">QTY</text>
           <text class="small" transform="translate(80.01 84.39) scale(1.04 1)">G.W.(Kg)</text>
           <text class="small" transform="translate(125.48 84.39) scale(1.04 1)">LOT NO.</text>
-
-          <!-- กรอบตาราง -->
           <path class="black" d="M164.55,93.9H7.71v-16.74h156.84v16.74ZM8.23,93.39h155.78v-15.71H8.23v15.71Z"/>
           <rect class="black" x="51.71" y="77.43" width=".53" height="16.22"/>
           <rect class="black" x="77.25" y="77.43" width=".53" height="16.22"/>
           <rect class="black" x="114.29" y="77.43" width=".53" height="16.22"/>
+          <text class="bold-small table-value" x="29.97" y="92.11">${escapeText(data.location)}</text>
+          <text class="bold-small table-value" x="64.48" y="92.11">${escapeText(data.qty)}</text>
+          <text class="bold-small table-value" x="95.77" y="92.11">${escapeText(data.grossWeight)}</text>
+          <text class="bold-small table-value" x="139.15" y="92.11">${escapeText(data.lotNo)}</text>
+        </svg>`;
+    }
 
-          <!-- ค่าตาราง -->
-          <text class="bold-small table-value" x="29.97" y="90.75">${escapeText(data.location)}</text>
-          <text class="bold-small table-value" x="64.75" y="90.75">${escapeText(data.qty)}</text>
-          <text class="bold-small table-value" x="96.04" y="90.75">${escapeText(data.grossWeight)}</text>
-          <text class="bold-small table-value" x="139.42" y="90.75">${escapeText(data.lotNo)}</text>
-        </svg>
-      `;
+    function updateBatchControls() {
+      const toolbar = byId("previewToolbar");
+      const thumbs = byId("batchThumbs");
+      const counter = byId("previewCounter");
+      const prevBtn = byId("prevBatchBtn");
+      const nextBtn = byId("nextBatchBtn");
+      const prevPageBtn = byId("prevBatchPageBtn");
+      const nextPageBtn = byId("nextBatchPageBtn");
+      const counts = byId("batchCounts");
+      const summary = byId("batchSummary");
+
+      if (currentMode !== "batch") {
+        toolbar.classList.remove("active");
+        thumbs.classList.remove("active");
+        return;
+      }
+
+      const { items, lists } = parseBatchItems();
+      const total = items.length;
+      const { start, end, pageCount } = getVisibleBatchRange(total);
+      if (batchIndex < start || batchIndex >= end) batchIndex = start;
+      if (batchIndex >= total) batchIndex = total - 1;
+      if (batchIndex < 0) batchIndex = 0;
+
+      toolbar.classList.add("active");
+      thumbs.classList.add("active");
+      counter.innerHTML = `Preview ${batchIndex + 1} / ${total}<br>กำลังดูรายการ ${start + 1}-${end} จากทั้งหมด ${total}`;
+      prevBtn.disabled = batchIndex <= 0;
+      nextBtn.disabled = batchIndex >= total - 1;
+      prevPageBtn.disabled = currentBatchPage <= 0;
+      nextPageBtn.disabled = currentBatchPage >= pageCount - 1;
+
+      const lineCounts = [
+        ["Title", lists.title.length],
+        ["English", lists.subtitle.length],
+        ["Thai", lists.thaiName.length],
+        ["GTIN-13", lists.gtin13.length],
+        ["ITF-14", lists.manualItf14.length],
+        ["LOCATION", lists.location.length],
+        ["QTY", lists.qty.length],
+        ["G.W.", lists.grossWeight.length],
+        ["LOT", lists.lotNo.length]
+      ];
+      counts.innerHTML = `อ่านข้อมูลได้ <strong>${total}</strong> รายการ | ${lineCounts.map(([name, count]) => `${name}: ${count || "default"}`).join(" | ")}`;
+      summary.textContent = `กำลังแสดงรายการ ${start + 1}-${end} จากทั้งหมด ${total} รายการ ปุ่ม Export ZIP จะส่งออกเฉพาะชุดนี้`;
+
+      thumbs.innerHTML = items.slice(start, end).map((item, offset) => {
+        const absoluteIndex = start + offset;
+        let itfText = onlyDigits(item.manualItf14);
+        if (itfText.length !== 14) {
+          try { itfText = getITF14(item).value; } catch (error) { itfText = "ตรวจสอบ GTIN"; }
+        }
+        return `
+          <button class="thumb-btn ${absoluteIndex === batchIndex ? "active" : ""}" type="button" onclick="selectBatchItem(${absoluteIndex})">
+            #${absoluteIndex + 1} <span>QTY ${escapeText(item.qty)}</span>
+            <span>${escapeText(item.subtitle)}</span>
+            <span>${escapeText(itfText)}</span>
+          </button>`;
+      }).join("");
     }
 
     function update() {
-      renderLabel(collectData());
+      updateBatchControls();
+      renderLabel(getPreviewData());
+    }
+
+    function setMode(mode) {
+      currentMode = mode === "batch" ? "batch" : "single";
+      byId("singleModeBtn").classList.toggle("active", currentMode === "single");
+      byId("batchModeBtn").classList.toggle("active", currentMode === "batch");
+      byId("singleFormSection").classList.toggle("hidden", currentMode === "batch");
+      byId("batchSection").classList.toggle("hidden", currentMode !== "batch");
+      byId("singleActions").classList.toggle("hidden", currentMode !== "single");
+      byId("batchActions").classList.toggle("hidden", currentMode !== "batch");
+      update();
+    }
+
+    function selectBatchItem(index) {
+      batchIndex = index;
+      currentBatchPage = Math.floor(batchIndex / BATCH_PAGE_SIZE);
+      update();
+    }
+
+    function prevBatchItem() {
+      selectBatchItem(Math.max(0, batchIndex - 1));
+    }
+
+    function nextBatchItem() {
+      const { items } = parseBatchItems();
+      selectBatchItem(Math.min(items.length - 1, batchIndex + 1));
+    }
+
+    function prevBatchPage() {
+      currentBatchPage = Math.max(0, currentBatchPage - 1);
+      batchIndex = currentBatchPage * BATCH_PAGE_SIZE;
+      update();
+    }
+
+    function nextBatchPage() {
+      const { items } = parseBatchItems();
+      const maxPage = Math.max(0, Math.ceil(items.length / BATCH_PAGE_SIZE) - 1);
+      currentBatchPage = Math.min(maxPage, currentBatchPage + 1);
+      batchIndex = currentBatchPage * BATCH_PAGE_SIZE;
+      update();
     }
 
     function loadSample() {
       for (const [key, value] of Object.entries(sampleData)) {
-        const el = document.getElementById(key);
+        const el = byId(key);
         if (el) el.value = value;
       }
+      batchIndex = 0;
+      currentBatchPage = 0;
       update();
     }
 
-    function getEditableSVGSource() {
-      const svg = document.getElementById("label-svg");
-      if (!svg) return "";
+    function loadBatchSample() {
+      for (const [key, value] of Object.entries(batchSampleData)) {
+        const el = byId(key);
+        if (el) el.value = value;
+      }
+      batchIndex = 0;
+      currentBatchPage = 0;
+      setMode("batch");
+    }
 
+    function fillBatchFromCurrentForm() {
+      const data = collectData();
+      byId("batchTitleList").value = data.title;
+      byId("batchSubtitleList").value = data.subtitle;
+      byId("batchThaiNameList").value = data.thaiName;
+      byId("batchGtin13List").value = data.gtin13;
+      byId("batchItf14List").value = data.manualItf14;
+      byId("batchLocationList").value = data.location;
+      byId("batchQtyList").value = data.qty;
+      byId("batchGrossWeightList").value = data.grossWeight;
+      byId("batchLotNoList").value = data.lotNo;
+      batchIndex = 0;
+      currentBatchPage = 0;
+      setMode("batch");
+    }
+
+    function getEditableSVGSource() {
+      const svg = byId("label-svg");
+      if (!svg) return "";
       const cloned = svg.cloneNode(true);
       cloned.setAttribute("xmlns", "http://www.w3.org/2000/svg");
       cloned.setAttribute("x", String(EXPORT_MARGIN_MM));
@@ -760,11 +1117,9 @@
       cloned.setAttribute("height", `${LABEL_HEIGHT_MM}mm`);
       cloned.setAttribute("shape-rendering", "crispEdges");
       cloned.querySelectorAll("image").forEach((node) => node.remove());
-
       const desc = document.createElementNS("http://www.w3.org/2000/svg", "desc");
       desc.textContent = "Editable SVG preview source with 30mm export margin. Final supplier workflow should use Export Supplier PDF.";
       cloned.insertBefore(desc, cloned.firstChild);
-
       const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
       wrapper.setAttribute("viewBox", `0 0 ${EXPORT_WIDTH_MM} ${EXPORT_HEIGHT_MM}`);
@@ -772,51 +1127,34 @@
       wrapper.setAttribute("height", `${EXPORT_HEIGHT_MM}mm`);
       wrapper.setAttribute("shape-rendering", "crispEdges");
       wrapper.appendChild(cloned);
-
       return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(wrapper);
     }
 
     function exportSupplierPDF() {
-      const status = document.getElementById("status");
+      const status = byId("status");
       const originalTitle = document.title;
       const fileBaseName = makeExportFileBaseName();
-
       document.title = fileBaseName;
       status.className = "status ok";
       status.innerHTML = `<strong>Export Supplier PDF</strong>หน้าต่างพิมพ์จะเปิดขึ้น ให้เลือก Destination: Save as PDF แล้วกด Save ชื่อไฟล์ที่แนะนำคือ ${escapeText(fileBaseName)}.pdf`;
-
-      // Give the status text a tiny moment to update before opening print.
       window.setTimeout(() => {
         window.print();
-        window.setTimeout(() => {
-          document.title = originalTitle;
-        }, 500);
+        window.setTimeout(() => { document.title = originalTitle; }, 500);
       }, 120);
     }
 
     function downloadEditableSVG() {
       const source = getEditableSVGSource();
       if (!source) return;
-
-      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = `${makeExportFileBaseName()}_editable.svg`;
-      link.click();
-
-      URL.revokeObjectURL(url);
-
-      const status = document.getElementById("status");
+      downloadBlob(new Blob([source], { type: "image/svg+xml;charset=utf-8" }), `${makeExportFileBaseName()}_editable.svg`);
+      const status = byId("status");
       status.className = "status ok";
       status.innerHTML = "<strong>Export SVG Editable สำเร็จ</strong>ไฟล์นี้มีข้อความเป็น SVG text สำหรับแก้ไข/debug เท่านั้น ไฟล์ final แนะนำให้ใช้ Export Supplier PDF";
     }
 
     function buildExportSVGSource(background = "transparent") {
-      const svg = document.getElementById("label-svg");
+      const svg = byId("label-svg");
       if (!svg) return "";
-
       const cloned = svg.cloneNode(true);
       cloned.setAttribute("xmlns", "http://www.w3.org/2000/svg");
       cloned.setAttribute("viewBox", `0 0 ${LABEL_WIDTH_MM} ${LABEL_HEIGHT_MM}`);
@@ -826,14 +1164,10 @@
       cloned.removeAttribute("y");
       cloned.removeAttribute("style");
       cloned.querySelectorAll("image").forEach((node) => node.remove());
-
       const labelSource = new XMLSerializer().serializeToString(cloned);
       const bg = background !== "transparent"
         ? `<rect x="0" y="0" width="${EXPORT_WIDTH_MM}" height="${EXPORT_HEIGHT_MM}" fill="${background}"/>`
         : "";
-
-      // Build a clean export-only SVG string instead of reusing the on-screen SVG element.
-      // This prevents PNG/JPG exports from being cropped by browser-specific intrinsic SVG sizing.
       return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${EXPORT_WIDTH_MM} ${EXPORT_HEIGHT_MM}" width="${EXPORT_WIDTH_MM}mm" height="${EXPORT_HEIGHT_MM}mm" overflow="visible">
   ${bg}
@@ -850,53 +1184,59 @@
           reject(new Error("ไม่พบ Preview SVG บนหน้าเว็บ"));
           return;
         }
-
         const canvasWidth = Math.round(EXPORT_WIDTH_MM * scale);
         const canvasHeight = Math.round(EXPORT_HEIGHT_MM * scale);
         const svg64 = btoa(unescape(encodeURIComponent(source)));
         const img = new Image();
-
         img.onload = () => {
           const canvas = document.createElement("canvas");
           canvas.width = canvasWidth;
           canvas.height = canvasHeight;
-
           const ctx = canvas.getContext("2d");
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
-
           if (background !== "transparent") {
             ctx.fillStyle = background;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           } else {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
           }
-
           ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
           resolve(canvas);
         };
-
-        img.onerror = () => {
-          reject(new Error("แปลง Preview เป็นรูปภาพไม่สำเร็จ"));
-        };
-
+        img.onerror = () => reject(new Error("แปลง Preview เป็นรูปภาพไม่สำเร็จ"));
         img.src = `data:image/svg+xml;base64,${svg64}`;
       });
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("สร้างไฟล์รูปภาพไม่สำเร็จ")), type, quality);
+      });
+    }
+
+    async function blobToUint8Array(blob) {
+      return new Uint8Array(await blob.arrayBuffer());
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
     }
 
     async function downloadPNGPreview() {
       try {
         const canvas = await svgPreviewToCanvas(10);
-        const link = document.createElement("a");
-        link.href = canvas.toDataURL("image/png");
-        link.download = `${makeExportFileBaseName()}_preview.png`;
-        link.click();
-
-        const status = document.getElementById("status");
+        downloadBlob(await canvasToBlob(canvas, "image/png"), `${makeExportFileBaseName()}_preview.png`);
+        const status = byId("status");
         status.className = "status ok";
         status.innerHTML = "<strong>Export PNG Preview สำเร็จ</strong>ไฟล์ PNG ใช้ตรวจดูภาพเท่านั้น ไฟล์ final สำหรับ Supplier ให้ใช้ Export Supplier PDF";
       } catch (error) {
-        const status = document.getElementById("status");
+        const status = byId("status");
         status.className = "status bad";
         status.innerHTML = `<strong>Export PNG ไม่สำเร็จ</strong>${escapeText(error.message)}`;
       }
@@ -905,27 +1245,144 @@
     async function downloadJPGPreview() {
       try {
         const canvas = await svgPreviewToCanvas(10, "#ffffff");
-        const link = document.createElement("a");
-        link.href = canvas.toDataURL("image/jpeg", 0.95);
-        link.download = `${makeExportFileBaseName()}_preview.jpg`;
-        link.click();
-
-        const status = document.getElementById("status");
+        downloadBlob(await canvasToBlob(canvas, "image/jpeg", 0.95), `${makeExportFileBaseName()}_preview.jpg`);
+        const status = byId("status");
         status.className = "status ok";
         status.innerHTML = "<strong>Export JPG Preview สำเร็จ</strong>ไฟล์ JPG ใช้ตรวจดูภาพเท่านั้น ไฟล์ final สำหรับ Supplier ให้ใช้ Export Supplier PDF";
       } catch (error) {
-        const status = document.getElementById("status");
+        const status = byId("status");
         status.className = "status bad";
         status.innerHTML = `<strong>Export JPG ไม่สำเร็จ</strong>${escapeText(error.message)}`;
       }
     }
 
-    document.querySelectorAll("input, select").forEach((el) => {
+    const crcTable = (() => {
+      const table = new Uint32Array(256);
+      for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        table[i] = c >>> 0;
+      }
+      return table;
+    })();
+
+    function crc32(data) {
+      let crc = 0xffffffff;
+      for (let i = 0; i < data.length; i++) crc = crcTable[(crc ^ data[i]) & 0xff] ^ (crc >>> 8);
+      return (crc ^ 0xffffffff) >>> 0;
+    }
+
+    function push16(out, value) { out.push(value & 0xff, (value >>> 8) & 0xff); }
+    function push32(out, value) { out.push(value & 0xff, (value >>> 8) & 0xff, (value >>> 16) & 0xff, (value >>> 24) & 0xff); }
+
+    function dosDateTime(date = new Date()) {
+      const time = (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
+      const dosDate = ((date.getFullYear() - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate();
+      return { time, date: dosDate };
+    }
+
+    function makeZip(files) {
+      const encoder = new TextEncoder();
+      const localParts = [];
+      const centralParts = [];
+      let offset = 0;
+      const stamp = dosDateTime();
+      for (const file of files) {
+        const nameBytes = encoder.encode(file.name);
+        const data = file.data;
+        const crc = crc32(data);
+        const local = [];
+        push32(local, 0x04034b50); push16(local, 20); push16(local, 0); push16(local, 0);
+        push16(local, stamp.time); push16(local, stamp.date); push32(local, crc);
+        push32(local, data.length); push32(local, data.length); push16(local, nameBytes.length); push16(local, 0);
+        localParts.push(new Uint8Array(local), nameBytes, data);
+        const central = [];
+        push32(central, 0x02014b50); push16(central, 20); push16(central, 20); push16(central, 0); push16(central, 0);
+        push16(central, stamp.time); push16(central, stamp.date); push32(central, crc);
+        push32(central, data.length); push32(central, data.length); push16(central, nameBytes.length);
+        push16(central, 0); push16(central, 0); push16(central, 0); push16(central, 0); push32(central, 0); push32(central, offset);
+        centralParts.push(new Uint8Array(central), nameBytes);
+        offset += local.length + nameBytes.length + data.length;
+      }
+      const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0);
+      const end = [];
+      push32(end, 0x06054b50); push16(end, 0); push16(end, 0); push16(end, files.length); push16(end, files.length);
+      push32(end, centralSize); push32(end, offset); push16(end, 0);
+      return new Blob([...localParts, ...centralParts, new Uint8Array(end)], { type: "application/zip" });
+    }
+
+    async function downloadBatchZip(format) {
+      const status = byId("status");
+      const { items } = parseBatchItems();
+      const { start, end } = getVisibleBatchRange(items.length);
+      const selectedItems = items.slice(start, end);
+      if (!selectedItems.length) {
+        status.className = "status bad";
+        status.innerHTML = "<strong>Export ZIP ไม่สำเร็จ</strong>ไม่พบข้อมูลสำหรับ Export";
+        return;
+      }
+
+      const originalIndex = batchIndex;
+      const imageType = format === "jpg" ? "image/jpeg" : "image/png";
+      const extension = format === "jpg" ? "jpg" : "png";
+      const zipFiles = [];
+      const padSize = String(items.length).length;
+      const firstBaseName = makeExportFileBaseName(selectedItems[0]);
+
+      status.className = "status ok";
+      status.innerHTML = `<strong>กำลัง Export ${extension.toUpperCase()} ZIP</strong>กำลังสร้างไฟล์ 1 / ${selectedItems.length}`;
+
+      try {
+        for (let i = 0; i < selectedItems.length; i++) {
+          const data = selectedItems[i];
+          const absoluteIndex = start + i;
+          renderLabel(data, { updateStatus: false });
+          const canvas = await svgPreviewToCanvas(10, format === "jpg" ? "#ffffff" : "transparent");
+          const blob = await canvasToBlob(canvas, imageType, format === "jpg" ? 0.95 : undefined);
+          const bytes = await blobToUint8Array(blob);
+          const running = String(absoluteIndex + 1).padStart(padSize, "0");
+          const itemBaseName = makeExportFileBaseName(data);
+          const itemName = `${itemBaseName}_x${items.length}_${running}_QTY${sanitizeFileNamePart(data.qty)}.${extension}`;
+          zipFiles.push({ name: itemName, data: bytes });
+          status.innerHTML = `<strong>กำลัง Export ${extension.toUpperCase()} ZIP</strong>กำลังสร้างไฟล์ ${i + 1} / ${selectedItems.length}`;
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        }
+        const zipName = makeBatchZipFileName(selectedItems[0], start, end, selectedItems.length, extension);
+        downloadBlob(makeZip(zipFiles), zipName);
+        batchIndex = originalIndex;
+        update();
+        status.className = "status ok";
+        status.innerHTML = `<strong>Export ${extension.toUpperCase()} ZIP สำเร็จ</strong>สร้างไฟล์รูปภาพชุด ${start + 1}-${end} ทั้งหมด ${selectedItems.length} ไฟล์เรียบร้อย`;
+      } catch (error) {
+        batchIndex = originalIndex;
+        update();
+        status.className = "status bad";
+        status.innerHTML = `<strong>Export ZIP ไม่สำเร็จ</strong>${escapeText(error.message)}`;
+      }
+    }
+
+    document.querySelectorAll("input, select, textarea").forEach((el) => {
       el.addEventListener("input", update);
       el.addEventListener("change", update);
     });
 
-    // Render preview immediately when the page opens
+    Object.assign(window, {
+      setMode,
+      loadSample,
+      loadBatchSample,
+      fillBatchFromCurrentForm,
+      selectBatchItem,
+      prevBatchItem,
+      nextBatchItem,
+      prevBatchPage,
+      nextBatchPage,
+      downloadPNGPreview,
+      downloadJPGPreview,
+      exportSupplierPDF,
+      downloadEditableSVG,
+      downloadBatchZip
+    });
+
     loadSample();
   </script>
 </body>
