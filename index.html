@@ -355,7 +355,24 @@
       <div class="row">
         <div>
           <label for="location">LOCATION</label>
-          <input id="location" value="IND" />
+          <select id="location">
+            <option value="THA">THA</option>
+            <option value="CHN">CHN</option>
+            <option value="JPN">JPN</option>
+            <option value="KOR">KOR</option>
+            <option value="TWN">TWN</option>
+            <option value="HKG">HKG</option>
+            <option value="IND" selected>IND</option>
+            <option value="USA / CAN">USA / CAN</option>
+            <option value="GBR">GBR</option>
+            <option value="DEU">DEU</option>
+            <option value="FRA">FRA</option>
+            <option value="AUS">AUS</option>
+            <option value="NZL">NZL</option>
+            <option value="VNM">VNM</option>
+            <option value="MYS">MYS</option>
+            <option value="SGP">SGP</option>
+          </select>
         </div>
         <div>
           <label for="grossWeight">G.W.(Kg)</label>
@@ -791,69 +808,74 @@
       status.innerHTML = "<strong>Export SVG Editable สำเร็จ</strong>ไฟล์นี้มีข้อความเป็น SVG text สำหรับแก้ไข/debug เท่านั้น ไฟล์ final แนะนำให้ใช้ Export Supplier PDF";
     }
 
+    function buildExportSVGSource(background = "transparent") {
+      const svg = document.getElementById("label-svg");
+      if (!svg) return "";
+
+      const cloned = svg.cloneNode(true);
+      cloned.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      cloned.setAttribute("viewBox", `0 0 ${LABEL_WIDTH_MM} ${LABEL_HEIGHT_MM}`);
+      cloned.setAttribute("width", String(LABEL_WIDTH_MM));
+      cloned.setAttribute("height", String(LABEL_HEIGHT_MM));
+      cloned.removeAttribute("x");
+      cloned.removeAttribute("y");
+      cloned.removeAttribute("style");
+      cloned.querySelectorAll("image").forEach((node) => node.remove());
+
+      const labelSource = new XMLSerializer().serializeToString(cloned);
+      const bg = background !== "transparent"
+        ? `<rect x="0" y="0" width="${EXPORT_WIDTH_MM}" height="${EXPORT_HEIGHT_MM}" fill="${background}"/>`
+        : "";
+
+      // Build a clean export-only SVG string instead of reusing the on-screen SVG element.
+      // This prevents PNG/JPG exports from being cropped by browser-specific intrinsic SVG sizing.
+      return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${EXPORT_WIDTH_MM} ${EXPORT_HEIGHT_MM}" width="${EXPORT_WIDTH_MM}mm" height="${EXPORT_HEIGHT_MM}mm" overflow="visible">
+  ${bg}
+  <g transform="translate(${EXPORT_MARGIN_MM} ${EXPORT_MARGIN_MM})">
+    ${labelSource}
+  </g>
+</svg>`;
+    }
+
     function svgPreviewToCanvas(scale = 10, background = "transparent") {
       return new Promise((resolve, reject) => {
-        const svg = document.getElementById("label-svg");
-        if (!svg) {
+        const source = buildExportSVGSource(background);
+        if (!source) {
           reject(new Error("ไม่พบ Preview SVG บนหน้าเว็บ"));
           return;
         }
 
-        const cloned = svg.cloneNode(true);
-        cloned.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        cloned.setAttribute("x", String(EXPORT_MARGIN_MM));
-        cloned.setAttribute("y", String(EXPORT_MARGIN_MM));
-        cloned.setAttribute("width", `${LABEL_WIDTH_MM}mm`);
-        cloned.setAttribute("height", `${LABEL_HEIGHT_MM}mm`);
-        cloned.setAttribute("preserveAspectRatio", "xMidYMid meet");
-
-        const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        wrapper.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        wrapper.setAttribute("viewBox", `0 0 ${EXPORT_WIDTH_MM} ${EXPORT_HEIGHT_MM}`);
-        wrapper.setAttribute("width", `${EXPORT_WIDTH_MM}mm`);
-        wrapper.setAttribute("height", `${EXPORT_HEIGHT_MM}mm`);
-
-        if (background !== "transparent") {
-          const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-          bg.setAttribute("x", "0");
-          bg.setAttribute("y", "0");
-          bg.setAttribute("width", String(EXPORT_WIDTH_MM));
-          bg.setAttribute("height", String(EXPORT_HEIGHT_MM));
-          bg.setAttribute("fill", background);
-          wrapper.appendChild(bg);
-        }
-
-        wrapper.appendChild(cloned);
-
-        const source = new XMLSerializer().serializeToString(wrapper);
-        const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
+        const canvasWidth = Math.round(EXPORT_WIDTH_MM * scale);
+        const canvasHeight = Math.round(EXPORT_HEIGHT_MM * scale);
+        const svg64 = btoa(unescape(encodeURIComponent(source)));
         const img = new Image();
 
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          canvas.width = Math.round(EXPORT_WIDTH_MM * scale);
-          canvas.height = Math.round(EXPORT_HEIGHT_MM * scale);
+          canvas.width = canvasWidth;
+          canvas.height = canvasHeight;
 
           const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+
           if (background !== "transparent") {
             ctx.fillStyle = background;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           } else {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
           }
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          URL.revokeObjectURL(url);
+          ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
           resolve(canvas);
         };
 
         img.onerror = () => {
-          URL.revokeObjectURL(url);
           reject(new Error("แปลง Preview เป็นรูปภาพไม่สำเร็จ"));
         };
 
-        img.src = url;
+        img.src = `data:image/svg+xml;base64,${svg64}`;
       });
     }
 
