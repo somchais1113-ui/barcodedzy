@@ -685,6 +685,11 @@
                 text-anchor: middle;
                 dominant-baseline: alphabetic;
               }
+
+              .table-value {
+                text-anchor: middle;
+                dominant-baseline: middle;
+              }
             </style>
           </defs>
 
@@ -697,7 +702,7 @@
           <text class="thai center-thai" x="86.27" y="35.62" textLength="135" lengthAdjust="spacingAndGlyphs">${escapeText(data.thaiName)}</text>
 
           <!-- ตัวเลขด้านบนบาร์โค้ด -->
-          <text class="top-barcode-text" transform="translate(104.6 44.26)">${topBarcodeText}</text>
+          <text class="top-barcode-text" x="148.05" y="44.26" text-anchor="end">${topBarcodeText}</text>
 
           <!-- กรอบบาร์โค้ด -->
           <path class="black" d="M164.4,66.05H8.14v-19.16h156.26v19.16ZM9.5,64.74h153.55v-16.53H9.5v16.53Z"/>
@@ -723,10 +728,10 @@
           <rect class="black" x="114.29" y="77.43" width=".53" height="16.22"/>
 
           <!-- ค่าตาราง -->
-          <text class="bold-small" transform="translate(22.96 92.11) scale(1.01 1)">${escapeText(data.location)}</text>
-          <text class="bold-small" transform="translate(62.58 92.11) scale(1.01 1)">${escapeText(data.qty)}</text>
-          <text class="bold-small" transform="translate(87 92.11) scale(1.01 1)">${escapeText(data.grossWeight)}</text>
-          <text class="bold-small" transform="translate(128 92.11) scale(1.01 1)">${escapeText(data.lotNo)}</text>
+          <text class="bold-small table-value" x="29.97" y="90.75">${escapeText(data.location)}</text>
+          <text class="bold-small table-value" x="64.75" y="90.75">${escapeText(data.qty)}</text>
+          <text class="bold-small table-value" x="96.04" y="90.75">${escapeText(data.grossWeight)}</text>
+          <text class="bold-small table-value" x="139.42" y="90.75">${escapeText(data.lotNo)}</text>
         </svg>
       `;
     }
