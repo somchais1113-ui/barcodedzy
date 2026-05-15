@@ -858,24 +858,29 @@
     }
 
     function buildOutlinedText(data, itfValue, topBarcodeText) {
+      // IMPORTANT:
+      // The preview uses live SVG <text>, but outlined export uses real path data.
+      // Font outline metrics are not identical to browser text metrics, so these
+      // production outline sizes are calibrated separately to match the label layout
+      // and prevent Illustrator overlap/distortion.
       return [
-        textToPath(data.title, 86.27, 15.92, 22.16, { align: "middle", targetWidth: 155 }),
-        textToPath(data.subtitle, 86.27, 25.56, 10.5, { align: "middle", targetWidth: 152 }),
-        textToPath(data.thaiName, 86.27, 35.62, 9.75, { align: "middle", targetWidth: 135 }),
+        textToPath(data.title, 86.27, 15.92, 15.2, { align: "middle", targetWidth: 155 }),
+        textToPath(data.subtitle, 86.27, 25.56, 6.9, { align: "middle", targetWidth: 152 }),
+        textToPath(data.thaiName, 86.27, 35.62, 7.2, { align: "middle", targetWidth: 135 }),
 
-        textToPath(topBarcodeText, 104.6, 44.26, 11.25),
+        textToPath(topBarcodeText, 104.6, 44.26, 7.8),
 
-        textToPath(itfValue, 7.49, 74.88, 13.5, { letterSpacing: 0.675 }),
+        textToPath(itfValue, 7.49, 74.88, 9.6, { letterSpacing: 0.42 }),
 
-        textToPath("LOCATION", 9.8, 84.61, 11.45, { sx: 1.04 }),
-        textToPath("QTY", 56.81, 84.39, 11.45, { sx: 1.04 }),
-        textToPath("G.W.(Kg)", 80.01, 84.39, 11.45, { sx: 1.04 }),
-        textToPath("LOT NO.", 125.48, 84.39, 11.45, { sx: 1.04 }),
+        textToPath("LOCATION", 9.8, 84.61, 7.8, { sx: 1.04 }),
+        textToPath("QTY", 56.81, 84.39, 7.8, { sx: 1.04 }),
+        textToPath("G.W.(Kg)", 80.01, 84.39, 7.8, { sx: 1.04 }),
+        textToPath("LOT NO.", 125.48, 84.39, 7.8, { sx: 1.04 }),
 
-        textToPath(data.location, 22.96, 92.11, 11.45, { sx: 1.01 }),
-        textToPath(data.qty, 62.58, 92.11, 11.45, { sx: 1.01 }),
-        textToPath(data.grossWeight, 87, 92.11, 11.45, { sx: 1.01 }),
-        textToPath(data.lotNo, 128, 92.11, 11.45, { sx: 1.01 })
+        textToPath(data.location, 22.96, 92.11, 8.2, { sx: 1.01 }),
+        textToPath(data.qty, 62.58, 92.11, 8.2, { sx: 1.01 }),
+        textToPath(data.grossWeight, 87, 92.11, 8.2, { sx: 1.01 }),
+        textToPath(data.lotNo, 128, 92.11, 8.2, { sx: 1.01 })
       ].join("\n  ");
     }
 
@@ -931,7 +936,7 @@
 
       const status = document.getElementById("status");
       status.className = "status ok";
-      status.innerHTML = "<strong>Export Outlined SVG สำเร็จ</strong>ข้อความถูกแปลงเป็น path แล้ว ไม่ใช่ SVG text และไม่มี embedded image";
+      status.innerHTML = "<strong>Export Outlined SVG สำเร็จ</strong>ข้อความถูกแปลงเป็น path แล้ว ไม่ใช่ SVG text, ไม่มี embedded image และปรับสเกล outline ให้ไม่ล้น/ซ้อนใน Illustrator";
     }
 
     function copyOutlinedSVG() {
