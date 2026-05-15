@@ -3,209 +3,97 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Barcode Studio - เครื่องมือสร้างบาร์โค้ดสินค้าแบบ static สำหรับ GitHub Pages">
-  <meta name="theme-color" content="#111827">
-  <title>Barcode Studio | สร้างบาร์โค้ดสินค้า</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Barcodedzy - สร้างบาร์โค้ดสินค้า</title>
+  <style>
+    :root{--bg:#f4f7fb;--card:#fff;--ink:#111827;--muted:#667085;--line:#d9e1ec;--brand:#2563eb;--brand2:#7c3aed;--ok:#047857;--bad:#b42318;--shadow:0 20px 50px rgba(15,23,42,.10)}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,#dbeafe,transparent 35%),var(--bg);color:var(--ink)}
+    .wrap{width:min(1160px,92vw);margin:auto;padding:28px 0 56px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:22px}.logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:var(--shadow)}.badge{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.75);font-size:13px;color:var(--muted)}
+    .hero{display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px}.hero h1{margin:0;font-size:clamp(34px,6vw,70px);line-height:.95;letter-spacing:-.06em}.hero p{max-width:760px;font-size:18px;line-height:1.7;color:var(--muted)}
+    .app{display:grid;grid-template-columns:390px 1fr;gap:20px;align-items:start}.card{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:28px;padding:22px;box-shadow:var(--shadow);backdrop-filter:blur(16px)}.card h2{margin:0 0 16px;font-size:22px}.field{display:grid;gap:8px;margin-bottom:15px}label{font-weight:750}select,input,textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:16px;padding:13px 14px;font:inherit;color:var(--ink)}textarea{resize:vertical;min-height:130px}.row{display:grid;grid-template-columns:1fr auto;gap:10px}.settings{display:grid;gap:12px;margin-top:12px}.range-row{display:grid;grid-template-columns:1fr 58px;gap:10px;align-items:center}.range-row input{padding:0}.small{font-size:13px;color:var(--muted);line-height:1.5}.msg{min-height:22px;font-size:14px;font-weight:700}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+    .btns{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.btn{border:0;border-radius:16px;padding:13px 14px;font-weight:850;cursor:pointer;background:#eaf1ff;color:#12306d}.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}.preview{min-height:430px;display:grid;gap:16px}.stage{background:#fff;border:1px dashed #b8c3d4;border-radius:24px;min-height:260px;display:grid;place-items:center;overflow:auto;padding:18px}.stage svg{max-width:100%;height:auto}.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.meta div{border:1px solid var(--line);border-radius:18px;padding:13px;background:#fff}.meta span{display:block;font-size:12px;text-transform:uppercase;color:var(--muted);font-weight:800}.meta strong{display:block;margin-top:5px;word-break:break-all}.batch{margin-top:20px}.batch-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.batch-result{display:grid;gap:12px;max-height:420px;overflow:auto}.batch-item{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px}.batch-item svg{max-width:100%;height:auto}.footer{margin-top:26px;color:var(--muted);font-size:14px;line-height:1.6}.tip{background:#ecfdf3;border:1px solid #abefc6;color:#05603a;border-radius:18px;padding:12px;margin-bottom:16px;font-weight:700}
+    @media(max-width:880px){.app,.batch-grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.btns{grid-template-columns:1fr}.meta{grid-template-columns:1fr}}
+    @media print{body{background:#fff}.top,.hero,.controls,.btns,.batch,.footer,.tip{display:none}.app{display:block}.preview{box-shadow:none;border:0}.stage{border:0}}
+  </style>
 </head>
 <body>
-  <a class="skip-link" href="#generator">ข้ามไปยังเครื่องมือสร้างบาร์โค้ด</a>
-
-  <header class="site-header">
-    <nav class="nav" aria-label="เมนูหลัก">
-      <a class="brand" href="./" aria-label="Barcode Studio Home">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>Barcode Studio</span>
-      </a>
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="สลับโหมดสี">
-        <span aria-hidden="true">◐</span>
-        <span class="theme-toggle-text">Theme</span>
-      </button>
-    </nav>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="logo"></span><span>Barcodedzy</span></div>
+      <div class="badge">สร้างบาร์โค้ดได้ทันทีใน Browser</div>
+    </header>
 
     <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">Static • GitHub Pages ready • No backend</p>
-        <h1>สร้างบาร์โค้ดสินค้าแบบเร็ว สวย และแชร์ให้ทีมใช้ได้ทันที</h1>
-        <p class="hero-lead">
-          รองรับบาร์โค้ดที่ใช้บ่อยในงานสินค้า เช่น EAN-13, EAN-8, UPC-A, CODE128, CODE39, ITF และ ITF-14
-          พร้อมดาวน์โหลดเป็น SVG หรือ PNG ได้จากหน้าเว็บเดียว
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#generator">เริ่มสร้างบาร์โค้ด</a>
-          <a class="button button-secondary" href="#batch">สร้างหลายรหัสพร้อมกัน</a>
-        </div>
-      </div>
-      <div class="hero-card" aria-label="ตัวอย่างบาร์โค้ด">
-        <div class="mini-window">
-          <span></span><span></span><span></span>
-        </div>
-        <svg id="heroBarcode" role="img" aria-label="ตัวอย่าง Barcode Studio"></svg>
-        <p>ตัวอย่าง: CODE128 สำหรับ SKU ภายในร้าน</p>
-      </div>
-    </section>
-  </header>
-
-  <main>
-    <section class="feature-grid" aria-label="จุดเด่น">
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">01</span>
-        <h2>เหมาะกับ GitHub</h2>
-        <p>เป็นเว็บ static เปิดไฟล์ได้ทันที หรือเอาขึ้น GitHub Pages โดยไม่ต้องมี server และไม่เก็บข้อมูลผู้ใช้</p>
-      </article>
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">02</span>
-        <h2>เช็คเลขสินค้าให้อัตโนมัติ</h2>
-        <p>EAN/UPC/ITF-14 สามารถคำนวณหรือแจ้งเตือน check digit ได้ ลดความผิดพลาดก่อนนำไปพิมพ์</p>
-      </article>
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">03</span>
-        <h2>ดาวน์โหลดง่าย</h2>
-        <p>ส่งออกเป็น SVG สำหรับงานออกแบบ หรือ PNG สำหรับเอกสารทั่วไป และพิมพ์จากเบราว์เซอร์ได้</p>
-      </article>
+      <h1>สร้างบาร์โค้ดสินค้า</h1>
+      <p>กรอกรหัส เลือกประเภท แล้วบาร์โค้ดจะแสดงในช่อง Preview ทันที ดาวน์โหลดเป็น SVG หรือ PNG ได้เลย ไม่ต้องใช้ server</p>
     </section>
 
-    <section class="workspace" id="generator">
-      <div class="panel controls-panel">
-        <div class="panel-heading">
-          <p class="eyebrow">Generator</p>
-          <h2>ตั้งค่าบาร์โค้ด</h2>
-        </div>
-
-        <form id="barcodeForm" class="form" autocomplete="off">
-          <div class="field">
-            <label for="format">ประเภทบาร์โค้ด</label>
-            <select id="format" name="format">
-              <option value="EAN13">EAN-13 / GTIN-13 สำหรับสินค้าขายปลีก</option>
-              <option value="EAN8">EAN-8 สำหรับสินค้าขนาดเล็ก</option>
-              <option value="UPC">UPC-A สำหรับสินค้าตลาดสหรัฐฯ</option>
-              <option value="CODE128" selected>CODE128 สำหรับ SKU / รหัสคลังสินค้า</option>
-              <option value="CODE39">CODE39 สำหรับรหัสตัวอักษรพื้นฐาน</option>
-              <option value="ITF14">ITF-14 / GTIN-14 สำหรับกล่องลัง</option>
-              <option value="ITF">ITF / Interleaved 2 of 5</option>
-            </select>
-            <small id="formatHelp">CODE128 รองรับตัวอักษร ตัวเลข และสัญลักษณ์ เหมาะกับ SKU ภายในร้าน</small>
-          </div>
-
-          <div class="field">
-            <label for="barcodeValue">รหัสสินค้า / ข้อความ</label>
-            <div class="input-row">
-              <input id="barcodeValue" name="barcodeValue" type="text" value="SKU-TH-0001" spellcheck="false" inputmode="text" required>
-              <button class="button button-ghost" id="sampleButton" type="button">ตัวอย่าง</button>
-            </div>
-            <small id="validationMessage" class="validation-message" role="status" aria-live="polite"></small>
-          </div>
-
-          <details class="settings" open>
-            <summary>ตั้งค่าการแสดงผล</summary>
-            <div class="settings-grid">
-              <label class="setting-field">
-                <span>ความหนาเส้น</span>
-                <input id="barWidth" type="range" min="1" max="5" step="0.5" value="2">
-                <output id="barWidthValue">2</output>
-              </label>
-              <label class="setting-field">
-                <span>ความสูง</span>
-                <input id="barHeight" type="range" min="40" max="180" step="5" value="96">
-                <output id="barHeightValue">96</output>
-              </label>
-              <label class="setting-field">
-                <span>ระยะขอบ</span>
-                <input id="barMargin" type="range" min="0" max="40" step="1" value="12">
-                <output id="barMarginValue">12</output>
-              </label>
-              <label class="setting-field">
-                <span>ขนาดตัวเลข</span>
-                <input id="fontSize" type="range" min="10" max="28" step="1" value="18">
-                <output id="fontSizeValue">18</output>
-              </label>
-              <label class="setting-field color-field">
-                <span>สีเส้น</span>
-                <input id="lineColor" type="color" value="#111827">
-              </label>
-              <label class="setting-field color-field">
-                <span>สีพื้นหลัง</span>
-                <input id="backgroundColor" type="color" value="#ffffff">
-              </label>
-              <label class="checkbox-field">
-                <input id="displayValue" type="checkbox" checked>
-                <span>แสดงตัวเลขใต้บาร์โค้ด</span>
-              </label>
-            </div>
-          </details>
-        </form>
-      </div>
-
-      <div class="panel preview-panel">
-        <div class="panel-heading preview-heading">
-          <div>
-            <p class="eyebrow">Preview</p>
-            <h2>ตัวอย่างก่อนดาวน์โหลด</h2>
-          </div>
-          <span class="status-pill" id="statusPill">Ready</span>
-        </div>
-
-        <div class="preview-stage" id="previewStage">
-          <svg id="barcode" role="img" aria-label="Generated barcode"></svg>
-        </div>
-
-        <div class="meta-list" aria-label="ข้อมูลบาร์โค้ด">
-          <div>
-            <span>Format</span>
-            <strong id="metaFormat">CODE128</strong>
-          </div>
-          <div>
-            <span>Value</span>
-            <strong id="metaValue">SKU-TH-0001</strong>
-          </div>
-        </div>
-
-        <div class="action-grid">
-          <button class="button button-primary" id="downloadSvg" type="button">ดาวน์โหลด SVG</button>
-          <button class="button button-secondary" id="downloadPng" type="button">ดาวน์โหลด PNG</button>
-          <button class="button button-secondary" id="copySvg" type="button">คัดลอก SVG</button>
-          <button class="button button-ghost" id="printBarcode" type="button">พิมพ์</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="batch panel" id="batch">
-      <div class="panel-heading">
-        <p class="eyebrow">Batch</p>
-        <h2>สร้างหลายรหัสพร้อมกัน</h2>
-        <p>ใส่หนึ่งรหัสต่อหนึ่งบรรทัด ระบบจะใช้ประเภทและค่าการแสดงผลเดียวกับด้านบน</p>
-      </div>
-      <div class="batch-layout">
+    <main class="app">
+      <section class="card controls">
+        <div class="tip">เริ่มตรงนี้: เลือกประเภท → ใส่รหัส → ดู Preview ด้านขวา</div>
+        <h2>ตั้งค่าบาร์โค้ด</h2>
         <div class="field">
-          <label for="batchInput">รายการรหัส</label>
-          <textarea id="batchInput" rows="8" spellcheck="false">SKU-TH-0001
-SKU-TH-0002
-SKU-TH-0003</textarea>
-          <div class="batch-actions">
-            <button class="button button-primary" id="generateBatch" type="button">สร้างรายการ</button>
-            <button class="button button-secondary" id="clearBatch" type="button">ล้างรายการ</button>
-          </div>
+          <label for="format">ประเภท</label>
+          <select id="format">
+            <option value="EAN13">EAN-13 / GTIN-13</option>
+            <option value="EAN8">EAN-8</option>
+            <option value="UPC">UPC-A</option>
+            <option value="CODE128" selected>CODE128 / SKU</option>
+            <option value="CODE39">CODE39</option>
+            <option value="ITF14">ITF-14 / GTIN-14</option>
+            <option value="ITF">ITF</option>
+          </select>
+          <div class="small" id="help"></div>
         </div>
-        <div class="batch-result" id="batchResult" aria-live="polite"></div>
-      </div>
+        <div class="field">
+          <label for="value">รหัสสินค้า</label>
+          <div class="row"><input id="value" value="SKU-TH-0001" spellcheck="false"><button class="btn" id="sample" type="button">ตัวอย่าง</button></div>
+          <div id="msg" class="msg"></div>
+        </div>
+        <div class="settings">
+          <label>ความหนาเส้น <div class="range-row"><input id="barWidth" type="range" min="1" max="5" step="0.5" value="2"><output id="barWidthOut">2</output></div></label>
+          <label>ความสูง <div class="range-row"><input id="barHeight" type="range" min="45" max="180" step="5" value="100"><output id="barHeightOut">100</output></div></label>
+          <label>ระยะขอบ <div class="range-row"><input id="margin" type="range" min="0" max="40" value="12"><output id="marginOut">12</output></div></label>
+          <label>ขนาดตัวเลข <div class="range-row"><input id="fontSize" type="range" min="10" max="28" value="18"><output id="fontSizeOut">18</output></div></label>
+          <label><input id="showText" type="checkbox" checked style="width:auto"> แสดงตัวเลขใต้บาร์โค้ด</label>
+        </div>
+      </section>
+
+      <section class="card preview">
+        <h2>Preview</h2>
+        <div class="stage"><svg id="barcode" aria-label="barcode preview"></svg></div>
+        <div class="meta"><div><span>Format</span><strong id="metaFormat">CODE128</strong></div><div><span>Value</span><strong id="metaValue">SKU-TH-0001</strong></div></div>
+        <div class="btns"><button class="btn primary" id="downloadSvg">ดาวน์โหลด SVG</button><button class="btn" id="downloadPng">ดาวน์โหลด PNG</button><button class="btn" id="copySvg">คัดลอก SVG</button><button class="btn" id="printBtn">พิมพ์</button></div>
+      </section>
+    </main>
+
+    <section class="card batch">
+      <h2>สร้างหลายรหัสพร้อมกัน</h2>
+      <div class="batch-grid"><div><textarea id="batchInput">SKU-TH-0001
+SKU-TH-0002
+SKU-TH-0003</textarea><div class="btns"><button class="btn primary" id="batchBtn">สร้างหลายรหัส</button><button class="btn" id="clearBatch">ล้าง</button></div></div><div id="batchResult" class="batch-result"></div></div>
     </section>
 
-    <section class="guide-grid" aria-label="คำแนะนำการเลือกประเภทบาร์โค้ด">
-      <article class="guide-card">
-        <h2>เลือกประเภทไหนดี?</h2>
-        <p><strong>EAN-13</strong> เหมาะกับสินค้าขายปลีกที่มี GTIN, <strong>UPC-A</strong> ใช้บ่อยในตลาดสหรัฐฯ, <strong>CODE128</strong> เหมาะกับ SKU ภายในร้านหรือคลังสินค้า</p>
-      </article>
-      <article class="guide-card">
-        <h2>ข้อควรระวังก่อนใช้งานจริง</h2>
-        <p>ถ้าจะใช้บาร์โค้ดบนสินค้าที่ขายผ่านค้าปลีกจริง ควรตรวจสอบเลข GTIN/UPC กับหน่วยงานหรือระบบที่เกี่ยวข้องก่อนพิมพ์จำนวนมาก</p>
-      </article>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <p>Barcode Studio เป็นตัวอย่างโปรเจกต์ static สำหรับแชร์บน GitHub. Generated barcodes run locally in your browser.</p>
-  </footer>
-
-  <script src="assets/js/app.js" defer></script>
+    <p class="footer">หมายเหตุ: ถ้าใช้กับสินค้าขายจริง ควรมีเลข GTIN/EAN/UPC ที่ถูกต้องจากระบบที่เกี่ยวข้องก่อนนำไปพิมพ์บนสินค้า</p>
+  </div>
+<script>
+(() => {"use strict";
+const $=s=>document.querySelector(s);const svgNS="http://www.w3.org/2000/svg";
+const EAN_L={0:"0001101",1:"0011001",2:"0010011",3:"0111101",4:"0100011",5:"0110001",6:"0101111",7:"0111011",8:"0110111",9:"0001011"};
+const EAN_G={0:"0100111",1:"0110011",2:"0011011",3:"0100001",4:"0011101",5:"0111001",6:"0000101",7:"0010001",8:"0001001",9:"0010111"};
+const EAN_R={0:"1110010",1:"1100110",2:"1101100",3:"1000010",4:"1011100",5:"1001110",6:"1010000",7:"1000100",8:"1001000",9:"1110100"};
+const PAR={0:"LLLLLL",1:"LLGLGG",2:"LLGGLG",3:"LLGGGL",4:"LGLLGG",5:"LGGLLG",6:"LGGGLL",7:"LGLGLG",8:"LGLGGL",9:"LGGLGL"};
+const ITF={0:"nnwwn",1:"wnnnw",2:"nwnnw",3:"wwnnn",4:"nnwnw",5:"wnwnn",6:"nwwnn",7:"nnnww",8:"wnnwn",9:"nwnwn"};
+const C39={"0":"nnnwwnwnn","1":"wnnwnnnnw","2":"nnwwnnnnw","3":"wnwwnnnnn","4":"nnnwwnnnw","5":"wnnwwnnnn","6":"nnwwwnnnn","7":"nnnwnnwnw","8":"wnnwnnwnn","9":"nnwwnnwnn",A:"wnnnnwnnw",B:"nnwnnwnnw",C:"wnwnnwnnn",D:"nnnnwwnnw",E:"wnnnwwnnn",F:"nnwnwwnnn",G:"nnnnnwwnw",H:"wnnnnwwnn",I:"nnwnnwwnn",J:"nnnnwwwnn",K:"wnnnnnnww",L:"nnwnnnnww",M:"wnwnnnnwn",N:"nnnnwnnww",O:"wnnnwnnwn",P:"nnwnwnnwn",Q:"nnnnnnwww",R:"wnnnnnwwn",S:"nnwnnnwwn",T:"nnnnwnwwn",U:"wwnnnnnnw",V:"nwwnnnnnw",W:"wwwnnnnnn",X:"nwnnwnnnw",Y:"wwnnwnnnn",Z:"nwwnwnnnn","-":"nwnnnnwnw",".":"wwnnnnwnn"," ":"nwwnnnwnn","$":"nwnwnwnnn","/":"nwnwnnnwn","+":"nwnnnwnwn","%":"nnnwnwnwn","*":"nwnnwnwnn"};
+const C128=["212222","222122","222221","121223","121322","131222","122213","122312","132212","221213","221312","231212","112232","122132","122231","113222","123122","123221","223211","221132","221231","213212","223112","312131","311222","321122","321221","312212","322112","322211","212123","212321","232121","111323","131123","131321","112313","132113","132311","211313","231113","231311","112133","112331","132131","113123","113321","133121","313121","211331","231131","213113","213311","213131","311123","311321","331121","312113","312311","332111","314111","221411","431111","111224","111422","121124","121421","141122","141221","112214","112412","122114","122411","142112","142211","241211","221114","413111","241112","134111","111242","121142","121241","114212","124112","124211","411212","421112","421211","212141","214121","412121","111143","111341","131141","114113","114311","411113","411311","113141","114131","311141","411131","211412","211214","211232","2331112"];
+const formats={EAN13:{label:"EAN-13",help:"ใส่เลข 12 หลัก แล้วระบบเติม check digit หรือใส่ 13 หลักเพื่อตรวจ",sample:"885123456789",norm:v=>gtin(v,12,"EAN-13"),enc:ean13},EAN8:{label:"EAN-8",help:"ใส่เลข 7 หรือ 8 หลัก",sample:"1234567",norm:v=>gtin(v,7,"EAN-8"),enc:ean8},UPC:{label:"UPC-A",help:"ใส่เลข 11 หรือ 12 หลัก",sample:"04210000526",norm:v=>gtin(v,11,"UPC-A"),enc:v=>ean13("0"+v)},CODE128:{label:"CODE128",help:"เหมาะกับ SKU ภายในร้าน รองรับตัวอักษร/ตัวเลข ASCII",sample:"SKU-TH-0001",norm:v=>{v=String(v||"").trim();if(!v)throw Error("กรุณาใส่รหัสสินค้า");if(/[^\x20-\x7E]/.test(v))throw Error("CODE128 รองรับอังกฤษ/ตัวเลข/สัญลักษณ์พื้นฐาน");return{value:v,msg:"สร้างได้แล้ว"}},enc:c128},CODE39:{label:"CODE39",help:"รองรับ A-Z, 0-9 และ - . $ / + %",sample:"ITEM-2026",norm:v=>{v=String(v||"").trim().toUpperCase();if(!v)throw Error("กรุณาใส่รหัสสินค้า");if(!/^[0-9A-Z .\-$\/+%]+$/.test(v))throw Error("CODE39 ใช้ได้เฉพาะ A-Z, 0-9 และ - . $ / + %");return{value:v,msg:"สร้างได้แล้ว"}},enc:c39},ITF14:{label:"ITF-14",help:"ใส่เลข 13 หรือ 14 หลัก",sample:"1001234567890",norm:v=>gtin(v,13,"ITF-14"),enc:v=>itf(v,true)},ITF:{label:"ITF",help:"ต้องเป็นตัวเลขจำนวนหลักคู่",sample:"12345678",norm:v=>{v=digits(v);if(!v)throw Error("กรุณาใส่ตัวเลข");if(v.length%2)throw Error("ITF ต้องมีจำนวนหลักคู่");return{value:v,msg:"สร้างได้แล้ว"}},enc:v=>itf(v,false)}};
+function digits(v){return String(v||"").replace(/\D/g,"")}function chk(v){v=digits(v);let s=0,w=3;for(let i=v.length-1;i>=0;i--){s+=Number(v[i])*w;w=w===3?1:3}return String((10-s%10)%10)}function gtin(v,n,label){v=digits(v);if(v.length!==n&&v.length!==n+1)throw Error(`${label} ต้องเป็นตัวเลข ${n} หรือ ${n+1} หลัก`);let body=v.slice(0,n),c=chk(body);if(v.length===n)return{value:body+c,msg:`เติม check digit ให้แล้ว: ${c}`};if(v.at(-1)!==c)throw Error(`check digit ไม่ถูกต้อง ควรเป็น ${c}`);return{value:v,msg:"check digit ถูกต้อง"}}
+function runs(bits){let a=[],cur=bits[0],w=0;for(const b of bits){if(b===cur)w++;else{a.push({bar:cur==="1",w});cur=b;w=1}}a.push({bar:cur==="1",w});return a}function ean13(v){let bits="101",p=PAR[v[0]];for(let i=1;i<=6;i++)bits+=p[i-1]==="L"?EAN_L[v[i]]:EAN_G[v[i]];bits+="01010";for(let i=7;i<=12;i++)bits+=EAN_R[v[i]];bits+="101";return{mods:runs(bits),text:v,q:10}}function ean8(v){let bits="101";for(let i=0;i<4;i++)bits+=EAN_L[v[i]];bits+="01010";for(let i=4;i<8;i++)bits+=EAN_R[v[i]];bits+="101";return{mods:runs(bits),text:v,q:8}}function itf(v,box){let m=[{bar:1,w:1},{bar:0,w:1},{bar:1,w:1},{bar:0,w:1}];for(let i=0;i<v.length;i+=2){let b=ITF[v[i]],s=ITF[v[i+1]];for(let j=0;j<5;j++){m.push({bar:1,w:b[j]==="w"?3:1},{bar:0,w:s[j]==="w"?3:1})}}m.push({bar:1,w:3},{bar:0,w:1},{bar:1,w:1});return{mods:m,text:v,q:10,box}}function c39(v){let m=[],t="*"+v+"*";for(const ch of t){let p=C39[ch];for(let i=0;i<p.length;i++)m.push({bar:i%2===0,w:p[i]==="w"?3:1});m.push({bar:0,w:1})}m.pop();return{mods:m,text:v,q:10}}function c128(v){let codes=[104];for(const ch of v)codes.push(ch.charCodeAt(0)-32);let cs=codes[0];for(let i=1;i<codes.length;i++)cs+=codes[i]*i;codes.push(cs%103,106);let m=[];for(const code of codes){let p=C128[code];for(let i=0;i<p.length;i++)m.push({bar:i%2===0,w:Number(p[i])})}return{mods:m,text:v,q:10}}
+function el(n,a={}){let x=document.createElementNS(svgNS,n);Object.entries(a).forEach(([k,v])=>x.setAttribute(k,v));return x}function draw(svg,data,opt){svg.innerHTML="";let mw=opt.w,bh=opt.h,txt=opt.text?opt.f+12:0,q=(data.q||10)*mw,cw=data.mods.reduce((s,i)=>s+i.w*mw,0),W=cw+q*2+opt.m*2,H=bh+txt+opt.m*2+(data.box?mw*6:0),top=opt.m+(data.box?mw*3:0),x=opt.m+q;svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.setAttribute("width",W);svg.setAttribute("height",H);svg.append(el("rect",{x:0,y:0,width:W,height:H,fill:"#fff"}));if(data.box)svg.append(el("rect",{x:opt.m+q-mw*4,y:opt.m,width:cw+mw*8,height:bh+mw*6,fill:"none",stroke:"#111827","stroke-width":mw*2}));for(const it of data.mods){let ww=it.w*mw;if(it.bar)svg.append(el("rect",{x,y:top,width:ww,height:bh,fill:"#111827"}));x+=ww}if(opt.text){let t=el("text",{x:W/2,y:top+bh+opt.f+5,"text-anchor":"middle","font-family":"ui-monospace,Consolas,monospace","font-size":opt.f,fill:"#111827"});t.textContent=data.text;svg.append(t)}}
+function opt(){return{w:Number($("#barWidth").value),h:Number($("#barHeight").value),m:Number($("#margin").value),f:Number($("#fontSize").value),text:$("#showText").checked}}function render(target=$("#barcode"),value=$("#value").value){let f=formats[$("#format").value],n=f.norm(value);draw(target,f.enc(n.value),opt());return n}
+function update(){["barWidth","barHeight","margin","fontSize"].forEach(id=>$("#"+id+"Out").value=$("#"+id).value);let f=formats[$("#format").value];$("#help").textContent=f.help;try{let n=render();$("#msg").className="msg ok";$("#msg").textContent=n.msg;$("#metaFormat").textContent=f.label;$("#metaValue").textContent=n.value;document.querySelectorAll(".preview .btn").forEach(b=>b.disabled=false)}catch(e){$("#barcode").innerHTML="";$("#msg").className="msg bad";$("#msg").textContent=e.message;$("#metaFormat").textContent=f.label;$("#metaValue").textContent="-";document.querySelectorAll(".preview .btn").forEach(b=>b.disabled=true)}}
+function svgText(){let c=$("#barcode").cloneNode(true);c.setAttribute("xmlns",svgNS);return new XMLSerializer().serializeToString(c)}function save(blob,name){let u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.append(a);a.click();a.remove();URL.revokeObjectURL(u)}function name(){return ($("#metaValue").textContent||"barcode").replace(/[^a-z0-9_-]+/gi,"-")}
+$("#format").onchange=()=>{$("#value").value=formats[$("#format").value].sample;update();batch()};document.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",update));$("#sample").onclick=()=>{$("#value").value=formats[$("#format").value].sample;update()};$("#downloadSvg").onclick=()=>save(new Blob([svgText()],{type:"image/svg+xml"}),name()+".svg");$("#downloadPng").onclick=()=>{let img=new Image(),u=URL.createObjectURL(new Blob([svgText()],{type:"image/svg+xml"}));img.onload=()=>{let c=document.createElement("canvas"),s=3;c.width=img.width*s;c.height=img.height*s;let ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>save(b,name()+".png"),"image/png")};img.src=u};$("#copySvg").onclick=async()=>{try{await navigator.clipboard.writeText(svgText());$("#msg").textContent="คัดลอก SVG แล้ว"}catch{$("#msg").textContent="คัดลอกไม่ได้ ให้ดาวน์โหลด SVG แทน"}};$("#printBtn").onclick=()=>print();function batch(){let out=$("#batchResult");out.innerHTML="";$("#batchInput").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,80).forEach(v=>{let card=document.createElement("div"),s=document.createElementNS(svgNS,"svg"),cap=document.createElement("strong");card.className="batch-item";try{let n=render(s,v);cap.textContent=n.value}catch(e){cap.textContent=v+": "+e.message}card.append(s,cap);out.append(card)})}$("#batchBtn").onclick=batch;$("#clearBatch").onclick=()=>{$("#batchInput").value="";$("#batchResult").innerHTML=""};update();batch();
+})();
+</script>
 </body>
 </html>
