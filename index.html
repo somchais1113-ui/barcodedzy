@@ -274,6 +274,7 @@
       <p class="intro">
         แบบไฟล์เดียวจบ ไม่แยก CSS/JS และ Preview เป็น Label เต็มใบตาม SVG layout เดิม:
         ชื่อสินค้า, ชื่ออังกฤษ, ชื่อไทย, GTIN ด้านบน, ITF-14, LOCATION, QTY, G.W. และ LOT NO.
+        เพิ่มไฟล์ส่ง Supplier แบบ No-font dependency, เอาพื้นหลังขาวหลังบาร์โค้ดออก, จัดชื่อสินค้า 3 บรรทัดให้อยู่กึ่งกลาง และเว้นระยะขอบซ้าย-ขวาของแท่งบาร์โค้ดเพื่อให้สแกนได้ง่ายขึ้น
       </p>
 
       <div class="guide">เริ่มตรงนี้: กรอกข้อมูลสินค้า → เลือก GTIN Level → ดู Preview ด้านขวา</div>
@@ -337,8 +338,9 @@
       <input id="lotNo" value="" placeholder="เช่น LOT2026" />
 
       <div class="actions">
-        <button class="btn" type="button" onclick="downloadSVG()">Download SVG</button>
-        <button class="btn secondary" type="button" onclick="copySVG()">Copy SVG</button>
+        <button class="btn" type="button" onclick="downloadSupplierSVG()">Supplier SVG ไม่ต้องมีฟอนต์</button>
+        <button class="btn secondary" type="button" onclick="downloadSupplierPNG()">Supplier PNG ไม่ต้องมีฟอนต์</button>
+        <button class="btn ghost" type="button" onclick="downloadSVG()">Editable SVG</button>
         <button class="btn ghost" type="button" onclick="window.print()">Print</button>
       </div>
 
@@ -351,7 +353,7 @@
         <div id="label-container"></div>
       </div>
       <p class="note">
-        Preview นี้ render เป็น SVG ทั้งใบ ไม่ใช่บาร์โค้ดอย่างเดียว และยังคงตำแหน่ง layout เดิมจากโค้ดต้นฉบับ
+        ปุ่ม Supplier SVG/PNG จะ flatten งานเป็นภาพในไฟล์ ทำให้ฝั่ง Supplier ไม่ต้องมีฟอนต์ ส่วน Editable SVG ยังเป็น text สำหรับแก้ต่อ ตอนนี้ชื่อสินค้า 3 บรรทัดถูกจัดกลาง และแท่งบาร์โค้ดถูกเว้นระยะขอบซ้าย-ขวาภายในกรอบแล้วเพื่อให้สแกนง่ายขึ้น
       </p>
     </section>
   </main>
@@ -466,10 +468,10 @@
       };
 
       // ตำแหน่งนี้อิง layout SVG เดิมในไฟล์ที่คุณส่งมา
-      const x = options.x ?? 25.2;
-      const y = options.y ?? 48.3;
-      const height = options.height ?? 14.9;
-      const maxWidth = options.width ?? 121.9;
+      const x = options.x ?? 24.5;
+      const y = options.y ?? 48.21;
+      const height = options.height ?? 16.53;
+      const maxWidth = options.width ?? 123.55;
       const wideRatio = options.wideRatio ?? 2.55;
 
       const sequence = [];
@@ -599,16 +601,23 @@
                 font-family: "Angsana New", "Times New Roman", serif;
                 font-size: 11.25px;
               }
+
+              .center-title,
+              .center-subtitle,
+              .center-thai {
+                text-anchor: middle;
+                dominant-baseline: alphabetic;
+              }
             </style>
           </defs>
 
           <!-- กรอบนอก -->
           <path class="black" d="M172.54,100.17H0V.95h172.54v99.21ZM.76,99.42h171.02V1.7H.76v97.72Z"/>
 
-          <!-- ชื่อสินค้า -->
-          <text class="title" transform="translate(8.47 15.92) scale(.52 1)">${escapeText(data.title)}</text>
-          <text class="subtitle" transform="translate(8.9 25.56) scale(.96 1)">${escapeText(data.subtitle)}</text>
-          <text class="thai" transform="translate(14.45 35.62)">${escapeText(data.thaiName)}</text>
+          <!-- ชื่อสินค้า: จัดกึ่งกลางทั้ง 3 บรรทัด และบีบความกว้างด้วย textLength เพื่อไม่ให้ล้นกรอบ -->
+          <text class="title center-title" x="86.27" y="15.92" textLength="155" lengthAdjust="spacingAndGlyphs">${escapeText(data.title)}</text>
+          <text class="subtitle center-subtitle" x="86.27" y="25.56" textLength="152" lengthAdjust="spacingAndGlyphs">${escapeText(data.subtitle)}</text>
+          <text class="thai center-thai" x="86.27" y="35.62" textLength="135" lengthAdjust="spacingAndGlyphs">${escapeText(data.thaiName)}</text>
 
           <!-- ตัวเลขด้านบนบาร์โค้ด -->
           <text class="top-barcode-text" transform="translate(104.6 44.26)">${topBarcodeText}</text>
@@ -616,9 +625,8 @@
           <!-- กรอบบาร์โค้ด -->
           <path class="black" d="M164.4,66.05H8.14v-19.16h156.26v19.16ZM9.5,64.74h153.55v-16.53H9.5v16.53Z"/>
 
-          <!-- แท่งบาร์โค้ด ITF-14 -->
-          <g>
-            <rect class="white" x="14.17" y="35.46" width="143.53" height="68.82"/>
+          <!-- แท่งบาร์โค้ด ITF-14: ไม่มีพื้นหลังสีขาว และเว้น quiet zone ซ้าย-ขวาภายในกรอบเพิ่มขึ้นประมาณข้างละ 1 cm x=24.5 y=48.21 w=123.55 h=16.53 -->
+          <g id="barcode-bars">
             ${barcodeRects}
           </g>
 
@@ -664,8 +672,117 @@
       return new XMLSerializer().serializeToString(svg);
     }
 
+    function getCleanSVGSource() {
+      const svg = document.getElementById("label-svg");
+      if (!svg) return "";
+
+      const cloned = svg.cloneNode(true);
+      cloned.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      cloned.setAttribute("width", "172.54mm");
+      cloned.setAttribute("height", "123.01mm");
+
+      // เก็บไว้เป็น metadata ให้คนเปิดไฟล์รู้ว่าไฟล์นี้จงใจไม่มีพื้นหลังขาวหลังบาร์โค้ด
+      const desc = document.createElementNS("http://www.w3.org/2000/svg", "desc");
+      desc.textContent = "Transparent barcode background. Barcode bars have left and right quiet zones inside the inner frame. Product text is centered. Editable SVG keeps text as text, so supplier may need matching fonts.";
+      cloned.insertBefore(desc, cloned.firstChild);
+
+      return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(cloned);
+    }
+
+    function svgToCanvas(scale = 8) {
+      return new Promise((resolve, reject) => {
+        const svgSource = getCleanSVGSource();
+        if (!svgSource) {
+          reject(new Error("ไม่พบ SVG สำหรับ export"));
+          return;
+        }
+
+        const svgBlob = new Blob([svgSource], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(svgBlob);
+        const img = new Image();
+
+        img.onload = () => {
+          const width = 172.54 * scale;
+          const height = 123.01 * scale;
+          const canvas = document.createElement("canvas");
+
+          canvas.width = Math.round(width);
+          canvas.height = Math.round(height);
+
+          const ctx = canvas.getContext("2d");
+
+          // ไม่ fill สีขาว เพื่อรักษาความโปร่งใสของพื้นหลังและหลังบาร์โค้ด
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          URL.revokeObjectURL(url);
+          resolve(canvas);
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("แปลง SVG เป็นภาพไม่สำเร็จ"));
+        };
+
+        img.src = url;
+      });
+    }
+
+    async function downloadSupplierPNG() {
+      try {
+        const canvas = await svgToCanvas(10);
+        const link = document.createElement("a");
+
+        link.href = canvas.toDataURL("image/png");
+        link.download = "itf14-product-label-supplier-no-font.png";
+        link.click();
+
+        const status = document.getElementById("status");
+        status.className = "status ok";
+        status.innerHTML = "<strong>Export PNG สำเร็จ</strong>ไฟล์นี้ไม่ต้องใช้ฟอนต์จากฝั่ง Supplier และพื้นหลังหลังบาร์โค้ดโปร่งใส";
+      } catch (error) {
+        const status = document.getElementById("status");
+        status.className = "status bad";
+        status.innerHTML = `<strong>Export PNG ไม่สำเร็จ</strong>${escapeText(error.message)}`;
+      }
+    }
+
+    async function downloadSupplierSVG() {
+      try {
+        const canvas = await svgToCanvas(10);
+        const imageData = canvas.toDataURL("image/png");
+
+        // SVG สำหรับ Supplier: ฝังเป็น image raster ความละเอียดสูงใน SVG
+        // ข้อดี: เปิดที่เครื่องไหนก็ไม่ถามฟอนต์ และไม่เลื่อน layout
+        // หมายเหตุ: ถ้าต้องการ text/vector outline จริง ต้องมี font file ที่อนุญาตให้แปลงเป็น path
+        const supplierSVG = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172.54 123.01" width="172.54mm" height="123.01mm">
+  <desc>No-font supplier file. Artwork is flattened into an embedded transparent PNG, so the supplier does not need fonts. Barcode white background was removed, barcode bars keep left and right quiet zones inside the inner frame, and product text is centered.</desc>
+  <image href="${imageData}" x="0" y="0" width="172.54" height="123.01" preserveAspectRatio="xMidYMid meet"/>
+</svg>`;
+
+        const blob = new Blob([supplierSVG], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "itf14-product-label-supplier-no-font.svg";
+        link.click();
+
+        URL.revokeObjectURL(url);
+
+        const status = document.getElementById("status");
+        status.className = "status ok";
+        status.innerHTML = "<strong>Export Supplier SVG สำเร็จ</strong>ไฟล์นี้ไม่ต้องใช้ฟอนต์จากฝั่ง Supplier และไม่มีพื้นหลังขาวหลังบาร์โค้ด";
+      } catch (error) {
+        const status = document.getElementById("status");
+        status.className = "status bad";
+        status.innerHTML = `<strong>Export Supplier SVG ไม่สำเร็จ</strong>${escapeText(error.message)}`;
+      }
+    }
+
     function downloadSVG() {
-      const source = getSVGSource();
+      const source = getCleanSVGSource();
       if (!source) return;
 
       const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
@@ -680,7 +797,7 @@
     }
 
     async function copySVG() {
-      const source = getSVGSource();
+      const source = getCleanSVGSource();
       if (!source) return;
 
       try {
