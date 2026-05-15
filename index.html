@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -23,7 +24,11 @@
       --radius: 22px;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
     body {
       margin: 0;
@@ -224,15 +229,16 @@
     }
 
     @page {
-      size: 172.54mm 123.01mm;
+      /* Export page = label size + 30mm margin on every side */
+      size: 232.54mm 183.01mm;
       margin: 0;
     }
 
     @media print {
       html,
       body {
-        width: 172.54mm;
-        height: 123.01mm;
+        width: 232.54mm;
+        height: 183.01mm;
         background: #fff;
         padding: 0;
         margin: 0;
@@ -251,16 +257,26 @@
       }
 
       .preview-panel {
+        width: 232.54mm;
+        height: 183.01mm;
         border: 0;
         box-shadow: none;
         padding: 0;
         position: static;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .preview-stage {
+        width: 232.54mm;
+        height: 183.01mm;
         border: 0;
         padding: 0;
         min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       #label-container {
@@ -370,12 +386,18 @@
         <div id="label-container"></div>
       </div>
       <p class="note">
-        Preview แสดงเป็น SVG บนหน้าเว็บโดยตรง ปุ่ม Export Supplier PDF จะเปิดหน้าพิมพ์เพื่อ Save as PDF เป็นไฟล์ final สำหรับส่ง Supplier
+        Preview แสดงเป็น SVG บนหน้าเว็บโดยตรง ปุ่ม Export Supplier PDF จะเปิดหน้าพิมพ์เพื่อ Save as PDF เป็นไฟล์ final สำหรับส่ง Supplier โดยหน้า export จะมี margin รอบ label ประมาณ 3 cm
       </p>
     </section>
   </main>
 
   <script>
+    const LABEL_WIDTH_MM = 172.54;
+    const LABEL_HEIGHT_MM = 123.01;
+    const EXPORT_MARGIN_MM = 30;
+    const EXPORT_PAGE_WIDTH_MM = LABEL_WIDTH_MM + (EXPORT_MARGIN_MM * 2);
+    const EXPORT_PAGE_HEIGHT_MM = LABEL_HEIGHT_MM + (EXPORT_MARGIN_MM * 2);
+
     const sampleData = {
       title: "QTM GELVOLUTION 007 HITZ",
       subtitle: "QUANTUM GELVOLUTION 007 HITZ ASST BLUE 0.7 MM (DM)",
@@ -399,6 +421,34 @@
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;");
+    }
+
+    function sanitizeFilenamePart(value, fallback = "Product") {
+      const cleaned = String(value || "")
+        .normalize("NFKC")
+        .replace(/[\\/:*?"<>|]/g, " ")
+        .replace(/[\u0000-\u001f\u007f]/g, " ")
+        .replace(/\s+/g, "_")
+        .replace(/_+/g, "_")
+        .replace(/^_+|_+$/g, "");
+
+      return (cleaned || fallback).slice(0, 90);
+    }
+
+    function getExportFilenameBase(data = collectData()) {
+      let itfValue = onlyDigits(data.manualItf14);
+
+      try {
+        itfValue = getITF14(data).value;
+      } catch (error) {
+        if (itfValue.length !== 14) itfValue = "ITF14";
+      }
+
+      const level = sanitizeFilenamePart(`Lv${onlyDigits(data.gtinLevel) || "X"}`, "LvX");
+      const englishName = sanitizeFilenamePart(data.subtitle || data.title, "Product");
+      const itfPart = onlyDigits(itfValue).length === 14 ? `ITF14_${onlyDigits(itfValue)}` : "ITF14";
+
+      return `Gtin_${level}_${englishName}_${itfPart}`;
     }
 
     function calcGtinCheckDigit(withoutCheckDigit) {
@@ -683,32 +733,56 @@
       update();
     }
 
-    function getEditableSVGSource() {
+    function getExportSVGSource(description = "Export source with 30mm page margin around the label.") {
       const svg = document.getElementById("label-svg");
       if (!svg) return "";
 
+      const ns = "http://www.w3.org/2000/svg";
+      const wrapper = document.createElementNS(ns, "svg");
       const cloned = svg.cloneNode(true);
-      cloned.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-      cloned.setAttribute("width", "172.54mm");
-      cloned.setAttribute("height", "123.01mm");
-      cloned.setAttribute("shape-rendering", "crispEdges");
+
+      wrapper.setAttribute("xmlns", ns);
+      wrapper.setAttribute("viewBox", `0 0 ${EXPORT_PAGE_WIDTH_MM} ${EXPORT_PAGE_HEIGHT_MM}`);
+      wrapper.setAttribute("width", `${EXPORT_PAGE_WIDTH_MM}mm`);
+      wrapper.setAttribute("height", `${EXPORT_PAGE_HEIGHT_MM}mm`);
+      wrapper.setAttribute("shape-rendering", "crispEdges");
+
+      const desc = document.createElementNS(ns, "desc");
+      desc.textContent = description;
+      wrapper.appendChild(desc);
+
+      cloned.setAttribute("x", EXPORT_MARGIN_MM);
+      cloned.setAttribute("y", EXPORT_MARGIN_MM);
+      cloned.setAttribute("width", LABEL_WIDTH_MM);
+      cloned.setAttribute("height", LABEL_HEIGHT_MM);
+      cloned.setAttribute("preserveAspectRatio", "xMidYMid meet");
       cloned.querySelectorAll("image").forEach((node) => node.remove());
+      wrapper.appendChild(cloned);
 
-      const desc = document.createElementNS("http://www.w3.org/2000/svg", "desc");
-      desc.textContent = "Editable SVG preview source. Final supplier workflow should use Export Supplier PDF.";
-      cloned.insertBefore(desc, cloned.firstChild);
+      return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(wrapper);
+    }
 
-      return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(cloned);
+    function getEditableSVGSource() {
+      return getExportSVGSource("Editable SVG preview source with 30mm margin. Final supplier workflow should use Export Supplier PDF.");
     }
 
     function exportSupplierPDF() {
       const status = document.getElementById("status");
-      status.className = "status ok";
-      status.innerHTML = "<strong>Export Supplier PDF</strong>หน้าต่างพิมพ์จะเปิดขึ้น ให้เลือก Destination: Save as PDF แล้วกด Save ไฟล์ PDF ที่ได้เหมาะสำหรับส่ง Supplier มากกว่า SVG outline";
+      const filenameBase = getExportFilenameBase();
+      const previousTitle = document.title;
 
-      // Give the status text a tiny moment to update before opening print.
+      status.className = "status ok";
+      status.innerHTML = `<strong>Export Supplier PDF</strong>หน้าต่างพิมพ์จะเปิดขึ้น ให้เลือก Destination: Save as PDF แล้วกด Save หน้า PDF จะ fit label ไว้กึ่งกลางและเว้นขอบประมาณ 3 cm ชื่อไฟล์แนะนำ: ${escapeText(filenameBase)}.pdf`;
+
+      // Browser print cannot force the saved PDF filename in every browser,
+      // but updating document.title helps Chrome/Edge suggest the desired name.
+      document.title = filenameBase;
+
       window.setTimeout(() => {
         window.print();
+        window.setTimeout(() => {
+          document.title = previousTitle;
+        }, 700);
       }, 120);
     }
 
@@ -721,14 +795,14 @@
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = "itf14-product-label-editable.svg";
+      link.download = `${getExportFilenameBase()}_editable.svg`;
       link.click();
 
       URL.revokeObjectURL(url);
 
       const status = document.getElementById("status");
       status.className = "status ok";
-      status.innerHTML = "<strong>Export SVG Editable สำเร็จ</strong>ไฟล์นี้มีข้อความเป็น SVG text สำหรับแก้ไข/debug เท่านั้น ไฟล์ final แนะนำให้ใช้ Export Supplier PDF";
+      status.innerHTML = "<strong>Export SVG Editable สำเร็จ</strong>ไฟล์นี้มีข้อความเป็น SVG text สำหรับแก้ไข/debug เท่านั้น และมี margin รอบ label ประมาณ 3 cm ไฟล์ final แนะนำให้ใช้ Export Supplier PDF";
     }
 
     function svgPreviewToCanvas(scale = 10) {
@@ -739,15 +813,15 @@
           return;
         }
 
-        const source = new XMLSerializer().serializeToString(svg);
+        const source = getExportSVGSource("PNG preview export with 30mm margin around the label.");
         const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const img = new Image();
 
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          canvas.width = Math.round(172.54 * scale);
-          canvas.height = Math.round(123.01 * scale);
+          canvas.width = Math.round(EXPORT_PAGE_WIDTH_MM * scale);
+          canvas.height = Math.round(EXPORT_PAGE_HEIGHT_MM * scale);
 
           const ctx = canvas.getContext("2d");
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -771,12 +845,12 @@
         const canvas = await svgPreviewToCanvas(10);
         const link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
-        link.download = "itf14-product-label-preview.png";
+        link.download = `${getExportFilenameBase()}_preview.png`;
         link.click();
 
         const status = document.getElementById("status");
         status.className = "status ok";
-        status.innerHTML = "<strong>Export PNG Preview สำเร็จ</strong>ไฟล์ PNG ใช้ตรวจดูภาพเท่านั้น ไฟล์ final สำหรับ Supplier ให้ใช้ Export Supplier PDF";
+        status.innerHTML = "<strong>Export PNG Preview สำเร็จ</strong>ไฟล์ PNG ใช้ตรวจดูภาพเท่านั้น โดยมี margin รอบ label ประมาณ 3 cm ไฟล์ final สำหรับ Supplier ให้ใช้ Export Supplier PDF";
       } catch (error) {
         const status = document.getElementById("status");
         status.className = "status bad";
