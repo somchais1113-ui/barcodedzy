@@ -339,8 +339,8 @@
 
       <div class="actions">
         <button class="btn" type="button" onclick="downloadVectorSVG()">Export Vector SVG</button>
-        <button class="btn secondary" type="button" onclick="downloadPNG()">Export PNG Preview</button>
-        <button class="btn ghost" type="button" onclick="copySVG()">Copy Vector SVG</button>
+        <button class="btn secondary" type="button" onclick="downloadPNGPreview()">Export PNG Preview</button>
+        <button class="btn ghost" type="button" onclick="copyVectorSVG()">Copy Vector SVG</button>
         <button class="btn ghost" type="button" onclick="window.print()">Print</button>
       </div>
 
@@ -353,7 +353,7 @@
         <div id="label-container"></div>
       </div>
       <p class="note">
-        ปุ่ม Export Vector SVG จะได้ไฟล์ SVG ที่เป็น vector จริง: กรอบเป็น path, บาร์โค้ดเป็น rect, ข้อความเป็น SVG text ไม่ฝังภาพ raster. ถ้าต้องการไม่พึ่งฟอนต์ 100% ต้อง Create Outlines ด้วยฟอนต์จริงใน Illustrator/Figma หรือใช้ระบบ server-side ที่มี font file ถูกลิขสิทธิ์
+        Preview แสดงเป็น SVG vector บนหน้าเว็บโดยตรง ส่วน Export Vector SVG จะได้ไฟล์ SVG ที่ไม่มี embedded image
       </p>
     </section>
   </main>
@@ -669,12 +669,6 @@
     function getSVGSource() {
       const svg = document.getElementById("label-svg");
       if (!svg) return "";
-      return new XMLSerializer().serializeToString(svg);
-    }
-
-    function getCleanSVGSource() {
-      const svg = document.getElementById("label-svg");
-      if (!svg) return "";
 
       const cloned = svg.cloneNode(true);
       cloned.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -682,19 +676,18 @@
       cloned.setAttribute("height", "123.01mm");
       cloned.setAttribute("shape-rendering", "crispEdges");
 
+      // กันพลาด: Vector SVG ต้องไม่มี embedded raster image
+      cloned.querySelectorAll("image").forEach((node) => node.remove());
+
       const desc = document.createElementNS("http://www.w3.org/2000/svg", "desc");
       desc.textContent = "True vector SVG. No embedded raster image. Barcode bars are rect elements. Product text remains SVG text.";
       cloned.insertBefore(desc, cloned.firstChild);
 
-      // Safety check: SVG export must not contain embedded bitmap images.
-      cloned.querySelectorAll("image").forEach((node) => node.remove());
-
-      return '<?xml version="1.0" encoding="UTF-8"?>
-' + new XMLSerializer().serializeToString(cloned);
+      return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(cloned);
     }
 
     function downloadVectorSVG() {
-      const source = getCleanSVGSource();
+      const source = getSVGSource();
       if (!source) return;
 
       const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
@@ -709,28 +702,41 @@
 
       const status = document.getElementById("status");
       status.className = "status ok";
-      status.innerHTML = "<strong>Export Vector SVG สำเร็จ</strong>ไฟล์นี้เป็น SVG vector จริง: ไม่มี embedded image, บาร์โค้ดเป็น rect, กรอบเป็น path, ข้อความเป็น SVG text";
+      status.innerHTML = "<strong>Export Vector SVG สำเร็จ</strong>ไฟล์นี้เป็น vector จริง: ไม่มี embedded image, บาร์โค้ดเป็น rect, กรอบเป็น path, ข้อความเป็น SVG text";
     }
 
-    function svgToCanvas(scale = 8) {
+    function copyVectorSVG() {
+      const source = getSVGSource();
+      if (!source) return;
+
+      navigator.clipboard.writeText(source).then(() => {
+        const status = document.getElementById("status");
+        status.className = "status ok";
+        status.innerHTML = "<strong>คัดลอก Vector SVG แล้ว</strong>นำไปวางในโปรแกรมออกแบบต่อได้เลย";
+      }).catch(() => {
+        const status = document.getElementById("status");
+        status.className = "status bad";
+        status.innerHTML = "<strong>คัดลอกไม่สำเร็จ</strong>Browser นี้อาจไม่อนุญาต clipboard ให้ใช้ Export Vector SVG แทน";
+      });
+    }
+
+    function svgPreviewToCanvas(scale = 10) {
       return new Promise((resolve, reject) => {
-        const svgSource = getCleanSVGSource();
-        if (!svgSource) {
-          reject(new Error("ไม่พบ SVG สำหรับ export"));
+        const svg = document.getElementById("label-svg");
+        if (!svg) {
+          reject(new Error("ไม่พบ Preview SVG บนหน้าเว็บ"));
           return;
         }
 
-        const svgBlob = new Blob([svgSource], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(svgBlob);
+        const source = new XMLSerializer().serializeToString(svg);
+        const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
         const img = new Image();
 
         img.onload = () => {
-          const width = 172.54 * scale;
-          const height = 123.01 * scale;
           const canvas = document.createElement("canvas");
-
-          canvas.width = Math.round(width);
-          canvas.height = Math.round(height);
+          canvas.width = Math.round(172.54 * scale);
+          canvas.height = Math.round(123.01 * scale);
 
           const ctx = canvas.getContext("2d");
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -742,45 +748,28 @@
 
         img.onerror = () => {
           URL.revokeObjectURL(url);
-          reject(new Error("แปลง SVG เป็น PNG ไม่สำเร็จ"));
+          reject(new Error("แปลง Preview เป็น PNG ไม่สำเร็จ"));
         };
 
         img.src = url;
       });
     }
 
-    async function downloadPNG() {
+    async function downloadPNGPreview() {
       try {
-        const canvas = await svgToCanvas(10);
+        const canvas = await svgPreviewToCanvas(10);
         const link = document.createElement("a");
-
         link.href = canvas.toDataURL("image/png");
         link.download = "itf14-product-label-preview.png";
         link.click();
 
         const status = document.getElementById("status");
         status.className = "status ok";
-        status.innerHTML = "<strong>Export PNG สำเร็จ</strong>ไฟล์ PNG เป็นภาพ preview เท่านั้น ถ้าต้องการ vector ให้ใช้ Export Vector SVG";
+        status.innerHTML = "<strong>Export PNG Preview สำเร็จ</strong>ไฟล์ PNG เป็นภาพ preview เท่านั้น ถ้าต้องการ vector ให้ใช้ Export Vector SVG";
       } catch (error) {
         const status = document.getElementById("status");
         status.className = "status bad";
         status.innerHTML = `<strong>Export PNG ไม่สำเร็จ</strong>${escapeText(error.message)}`;
-      }
-    }
-
-    async function copySVG() {
-      const source = getCleanSVGSource();
-      if (!source) return;
-
-      try {
-        await navigator.clipboard.writeText(source);
-        const status = document.getElementById("status");
-        status.className = "status ok";
-        status.innerHTML = "<strong>คัดลอก Vector SVG แล้ว</strong>นำไปวางในไฟล์หรือโปรแกรมออกแบบต่อได้เลย";
-      } catch (error) {
-        const status = document.getElementById("status");
-        status.className = "status bad";
-        status.innerHTML = "<strong>คัดลอกไม่สำเร็จ</strong>Browser นี้อาจไม่อนุญาต clipboard ให้ใช้ Download SVG แทน";
       }
     }
 
@@ -789,6 +778,7 @@
       el.addEventListener("change", update);
     });
 
+    // Render preview immediately when the page opens
     loadSample();
   </script>
 </body>
