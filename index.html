@@ -72,26 +72,34 @@
         <button id="batchModeBtn" class="mode-btn" type="button" onclick="setMode('batch')">สร้างหลายใบ<span>วางหลายชื่อ / หลาย GTIN / หลาย ITF-14 แยกตามช่อง</span></button>
       </div>
       <div id="singleFormSection">
-        <div class="section-title">ข้อมูลสินค้า</div>
-        <label for="title">ชื่อสินค้าบรรทัดใหญ่</label><input id="title" value="QTM GELVOLUTION 007 HITZ" />
-        <label for="subtitle">ชื่อสินค้าอังกฤษ</label><input id="subtitle" value="QUANTUM GELVOLUTION 007 HITZ ASST BLUE 0.7 MM (DM)" />
-        <label for="thaiName">ชื่อสินค้าไทย</label><input id="thaiName" value="ควอนตั้มเจลโวลูชั่น 007 ฮิทซ์น้ำเงินคละสี (DM)" />
+        <div class="section-title ean13-hide-single">ข้อมูลสินค้า</div>
+        <div class="ean13-hide-single">
+          <label for="title">ชื่อสินค้าบรรทัดใหญ่</label><input id="title" value="QTM GELVOLUTION 007 HITZ" />
+          <label for="subtitle">ชื่อสินค้าอังกฤษ</label><input id="subtitle" value="QUANTUM GELVOLUTION 007 HITZ ASST BLUE 0.7 MM (DM)" />
+          <label for="thaiName">ชื่อสินค้าไทย</label><input id="thaiName" value="ควอนตั้มเจลโวลูชั่น 007 ฮิทซ์น้ำเงินคละสี (DM)" />
+        </div>
         <div class="section-title">ข้อมูล GTIN / Barcode</div>
         <label for="gtin13">GTIN-13 / EAN-13 สินค้าเดี่ยว</label>
-        <div class="inline"><div><input id="gtin13" value="8851907346492" inputmode="numeric" /></div><button class="btn secondary" type="button" onclick="loadSample()">ตัวอย่าง</button></div>
-        <div class="row"><div><label for="gtinLevel">GTIN Level / Indicator</label><select id="gtinLevel"><option value="3" selected>Lv3 / Indicator 3</option><option value="4">Lv4 / Indicator 4</option></select></div><div><label for="qty">QTY</label><input id="qty" value="20" inputmode="numeric" /></div></div>
-        <label for="manualItf14">ITF-14 ด้านล่าง ถ้ามีเลขจริงจากระบบ ให้ใส่ช่องนี้</label><input id="manualItf14" value="38851907345397" inputmode="numeric" />
-        <p class="note">ถ้าช่องนี้ว่าง ระบบจะสร้าง ITF-14 จาก GTIN-13 + Level ให้อัตโนมัติ แต่ถ้าบริษัทมีเลข GTIN Lv3/Lv4 จริงอยู่แล้ว ให้ใส่เลข 14 หลักในช่องนี้เพื่อให้ Preview ตรงระบบ</p>
-        <div class="section-title">ข้อมูลตาราง</div>
-        <div class="row"><div><label for="location">LOCATION</label><select id="location"><option value="THA">THA</option><option value="CHN">CHN</option><option value="JPN">JPN</option><option value="KOR">KOR</option><option value="TWN">TWN</option><option value="HKG">HKG</option><option value="IND" selected>IND</option><option value="USA / CAN">USA / CAN</option><option value="GBR">GBR</option><option value="DEU">DEU</option><option value="FRA">FRA</option><option value="AUS">AUS</option><option value="NZL">NZL</option><option value="VNM">VNM</option><option value="MYS">MYS</option><option value="SGP">SGP</option></select></div><div><label for="grossWeight">G.W.(Kg)</label><input id="grossWeight" value="" placeholder="เช่น 1.25" /></div></div>
-        <label for="lotNo">LOT NO.</label><input id="lotNo" value="" placeholder="เช่น LOT2026" />
+        <div class="inline"><div><input id="gtin13" value="8851907346492" inputmode="numeric" /></div><button class="btn secondary" type="button" onclick="loadSample()">ตัวอย่าง</button><button class="btn ghost" type="button" onclick="loadEan13Sample()" title="โหลดตัวอย่าง EAN-13 พร้อมเปลี่ยนโหมด">EAN-13 Demo</button></div>
+        <div class="row"><div><label for="gtinLevel">GTIN Level / Indicator</label><select id="gtinLevel"><option value="3" selected>Lv3 / Indicator 3</option><option value="4">Lv4 / Indicator 4</option><option value="ean13">EAN-13 / บาร์โค้ดสินค้าเดี่ยว</option></select></div><div class="ean13-hide-single"><label for="qty">QTY</label><input id="qty" value="20" inputmode="numeric" /></div></div>
+        <div class="ean13-hide-single">
+          <label for="manualItf14">ITF-14 ด้านล่าง ถ้ามีเลขจริงจากระบบ ให้ใส่ช่องนี้</label><input id="manualItf14" value="38851907345397" inputmode="numeric" />
+          <p class="note">ถ้าช่องนี้ว่าง ระบบจะสร้าง ITF-14 จาก GTIN-13 + Level ให้อัตโนมัติ แต่ถ้าบริษัทมีเลข GTIN Lv3/Lv4 จริงอยู่แล้ว ให้ใส่เลข 14 หลักในช่องนี้เพื่อให้ Preview ตรงระบบ</p>
+        </div>
+        <div class="ean13-hide-single">
+          <div class="section-title">ข้อมูลตาราง</div>
+          <div class="row"><div><label for="location">LOCATION</label><select id="location"><option value="THA">THA</option><option value="CHN">CHN</option><option value="JPN">JPN</option><option value="KOR">KOR</option><option value="TWN">TWN</option><option value="HKG">HKG</option><option value="IND" selected>IND</option><option value="USA / CAN">USA / CAN</option><option value="GBR">GBR</option><option value="DEU">DEU</option><option value="FRA">FRA</option><option value="AUS">AUS</option><option value="NZL">NZL</option><option value="VNM">VNM</option><option value="MYS">MYS</option><option value="SGP">SGP</option></select></div><div><label for="grossWeight">G.W.(Kg)</label><input id="grossWeight" value="" placeholder="เช่น 1.25" /></div></div>
+          <label for="lotNo">LOT NO.</label><input id="lotNo" value="" placeholder="เช่น LOT2026" />
+        </div>
+        <div id="ean13Help" class="guide hidden" style="background:linear-gradient(90deg,#fef3c7,#fef9c3);border-color:#fcd34d;color:#854d0e;">โหมด EAN-13 — กรอกเฉพาะ GTIN-13 / EAN-13 ใส่ 12 หลัก ระบบจะคำนวณ check digit ให้ หรือใส่ 13 หลัก ระบบจะ validate ให้ ผลลัพธ์จะเป็น label ขนาด 70 × 20 mm มีเฉพาะ barcode และเลขข้างล่าง</div>
       </div>
       <div id="batchSection" class="hidden">
         <div class="section-title">ข้อมูลหลายรายการแบบแยกช่อง</div>
         <p class="note">วางข้อมูลจาก Excel / Google Sheets ทีละคอลัมน์ได้เลย ระบบจะจับคู่ตามลำดับบรรทัด ถ้าช่องไหนมีค่าเดียวจะใช้ค่านั้นกับทุกใบ ถ้าช่องไหนว่างจะใช้ค่าจากฟอร์มใบเดียว</p>
-        <div class="batch-card"><p class="batch-card-title">1. ชื่อสินค้า</p><label for="batchTitleList">ชื่อสินค้าบรรทัดใหญ่ หลายรายการ</label><textarea id="batchTitleList" placeholder="วางชื่อสินค้าบรรทัดใหญ่ ทีละบรรทัด"></textarea><label for="batchSubtitleList">ชื่อสินค้าอังกฤษ หลายรายการ</label><textarea id="batchSubtitleList" placeholder="วางชื่อสินค้าอังกฤษ ทีละบรรทัด"></textarea><label for="batchThaiNameList">ชื่อสินค้าไทย หลายรายการ</label><textarea id="batchThaiNameList" placeholder="วางชื่อสินค้าไทย ทีละบรรทัด"></textarea></div>
-        <div class="batch-card"><p class="batch-card-title">2. Barcode</p><label for="batchGtinLevel">GTIN Level / Indicator สำหรับชุดนี้</label><select id="batchGtinLevel"><option value="3" selected>Lv3 / Indicator 3</option><option value="4">Lv4 / Indicator 4</option></select><label for="batchGtin13List">GTIN-13 / EAN-13 หลายรายการ</label><textarea id="batchGtin13List" placeholder="วาง GTIN-13 ทีละบรรทัด"></textarea><label for="batchItf14List">ITF-14 Manual หลายรายการ</label><textarea id="batchItf14List" placeholder="วาง ITF-14 ทีละบรรทัด ถ้าเว้นว่าง ระบบจะ derive จาก GTIN-13 + Level"></textarea></div>
-        <div class="batch-card"><p class="batch-card-title">3. จำนวนและตาราง</p><label for="batchLocationList">LOCATION หลายรายการ</label><textarea id="batchLocationList" placeholder="เช่น CHN หรือวางหลายบรรทัด"></textarea><label for="batchQtyList">QTY หลายรายการ</label><textarea id="batchQtyList" placeholder="วาง QTY ทีละบรรทัด เช่น&#10;144&#10;144&#10;120"></textarea><label for="batchGrossWeightList">G.W.(Kg) หลายรายการ</label><textarea id="batchGrossWeightList" placeholder="วาง G.W. ทีละบรรทัด หรือเว้นว่าง"></textarea><label for="batchLotNoList">LOT NO. หลายรายการ</label><textarea id="batchLotNoList" placeholder="วาง LOT NO. ทีละบรรทัด หรือเว้นว่าง"></textarea></div>
+        <div class="batch-card ean13-hide-batch"><p class="batch-card-title">1. ชื่อสินค้า</p><label for="batchTitleList">ชื่อสินค้าบรรทัดใหญ่ หลายรายการ</label><textarea id="batchTitleList" placeholder="วางชื่อสินค้าบรรทัดใหญ่ ทีละบรรทัด"></textarea><label for="batchSubtitleList">ชื่อสินค้าอังกฤษ หลายรายการ</label><textarea id="batchSubtitleList" placeholder="วางชื่อสินค้าอังกฤษ ทีละบรรทัด"></textarea><label for="batchThaiNameList">ชื่อสินค้าไทย หลายรายการ</label><textarea id="batchThaiNameList" placeholder="วางชื่อสินค้าไทย ทีละบรรทัด"></textarea></div>
+        <div class="batch-card"><p class="batch-card-title">2. Barcode</p><label for="batchGtinLevel">GTIN Level / Indicator สำหรับชุดนี้</label><select id="batchGtinLevel"><option value="3" selected>Lv3 / Indicator 3</option><option value="4">Lv4 / Indicator 4</option><option value="ean13">EAN-13 / บาร์โค้ดสินค้าเดี่ยว</option></select><label for="batchGtin13List">GTIN-13 / EAN-13 หลายรายการ</label><textarea id="batchGtin13List" placeholder="วาง GTIN-13 ทีละบรรทัด"></textarea><div class="ean13-hide-batch"><label for="batchItf14List">ITF-14 Manual หลายรายการ</label><textarea id="batchItf14List" placeholder="วาง ITF-14 ทีละบรรทัด ถ้าเว้นว่าง ระบบจะ derive จาก GTIN-13 + Level"></textarea></div></div>
+        <div class="batch-card ean13-hide-batch"><p class="batch-card-title">3. จำนวนและตาราง</p><label for="batchLocationList">LOCATION หลายรายการ</label><textarea id="batchLocationList" placeholder="เช่น CHN หรือวางหลายบรรทัด"></textarea><label for="batchQtyList">QTY หลายรายการ</label><textarea id="batchQtyList" placeholder="วาง QTY ทีละบรรทัด เช่น&#10;144&#10;144&#10;120"></textarea><label for="batchGrossWeightList">G.W.(Kg) หลายรายการ</label><textarea id="batchGrossWeightList" placeholder="วาง G.W. ทีละบรรทัด หรือเว้นว่าง"></textarea><label for="batchLotNoList">LOT NO. หลายรายการ</label><textarea id="batchLotNoList" placeholder="วาง LOT NO. ทีละบรรทัด หรือเว้นว่าง"></textarea></div>
+        <div id="ean13HelpBatch" class="guide hidden" style="background:linear-gradient(90deg,#fef3c7,#fef9c3);border-color:#fcd34d;color:#854d0e;">โหมด EAN-13 (Batch) — กรอกเฉพาะ GTIN-13 / EAN-13 หลายรายการ ระบบจะคำนวณ check digit ให้อัตโนมัติเมื่อใส่ 12 หลัก หรือ validate เมื่อใส่ 13 หลัก ผลลัพธ์ทุกใบจะเป็น label ขนาด 70 × 20 mm</div>
         <div class="print-card"><p class="batch-card-title">4. จัดหน้าสำหรับพิมพ์</p><div class="row"><div><label for="printPaperSize">ขนาดกระดาษ</label><select id="printPaperSize"><option value="A4">A4</option><option value="A3">A3</option></select></div><div><label for="printOrientation">แนวกระดาษ</label><select id="printOrientation"><option value="portrait">แนวตั้ง</option><option value="landscape" selected>แนวนอน</option></select></div></div><label for="printGap">ระยะห่างระหว่าง Label</label><select id="printGap"><option value="5" selected>5 mm</option><option value="0">0 mm</option></select><p class="note">Print Sheet จะจัดเฉพาะชุดที่กำลังดู และใช้ browser print / Save as PDF เหมือน workflow เดิม กรุณาตั้ง Scale เป็น 100% หรือ Actual Size</p></div>
         <div class="actions"><button class="btn secondary" type="button" onclick="fillBatchFromCurrentForm()">ใช้ข้อมูลฟอร์มนี้เป็นตัวอย่าง</button><button class="btn ghost" type="button" onclick="loadBatchSample()">ตัวอย่างหลายสินค้า</button></div>
         <div id="batchCounts" class="batch-counts">ยังไม่ได้ใส่ข้อมูลหลายรายการ</div><p id="batchSummary" class="note">ระบบจะแสดงและ Export ทีละชุด ชุดละ 10 รายการ เพื่อลดอาการหน่วงเวลาใช้งานจริง</p>
@@ -116,9 +124,14 @@
     // PDF physical print sizes per GTIN Level (mm)
     const PDF_PRINT_SIZE = {
       "3": { w: 60,  h: 35 },   // Lv3 → 60 x 35 mm
-      "4": { w: 112, h: 60 }    // Lv4 → 112 x 60 mm
+      "4": { w: 112, h: 60 },   // Lv4 → 112 x 60 mm
+      "ean13": { w: 70, h: 20 } // EAN-13 → 70 x 20 mm (small product barcode)
     };
     function getPrintSize(level) { return PDF_PRINT_SIZE[String(level)] || PDF_PRINT_SIZE["3"]; }
+    function isEan13Mode(level) { return String(level) === "ean13"; }
+    // EAN-13 internal SVG dimensions match physical print size (70×20 mm)
+    const EAN13_LABEL_W = 70;
+    const EAN13_LABEL_H = 20;
     // Compute fit-to-page rectangle preserving aspect ratio (centered, with optional padding)
     function fitContain(srcW, srcH, dstW, dstH, paddingMm = 0) {
       const innerW = Math.max(0.1, dstW - paddingMm * 2);
@@ -182,6 +195,10 @@
     // Build outlined version of label SVG. Same dimensions as labelSvg() but text → paths.
     // Auto-fits table headers and values within their column boundaries to avoid overflow.
     function labelSvgOutlined(data, font) {
+      // Route to EAN-13 outlined mini label
+      if (isEan13Mode(data.gtinLevel)) {
+        return ean13LabelSvgOutlined(data, font);
+      }
       let itf = { value: "00000000000000", valid: false }, barcodeRects = "";
       try { itf = getITF14(data); barcodeRects = encodeITF14Rects(itf.value); } catch (error) {}
       const topBarcodeText = `${onlyDigits(data.gtin13)} x ${esc(data.qty)}`;
@@ -263,12 +280,23 @@
     }
     // Build the export-sized outlined SVG (with margin) — matches buildExportSVGSource layout
     function buildOutlinedExportSVG(data, font, background = "transparent") {
+      if (isEan13Mode(data.gtinLevel)) {
+        // EAN-13: no extra margin, dimensions are 70x20 mm
+        const labelInner = labelSvgOutlined(data, font).replace('width="100%" height="auto"', `width="${EAN13_LABEL_W}" height="${EAN13_LABEL_H}"`);
+        const bg = background !== "transparent" ? `<rect x="0" y="0" width="${EAN13_LABEL_W}" height="${EAN13_LABEL_H}" fill="${background}"/>` : "";
+        return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${EAN13_LABEL_W} ${EAN13_LABEL_H}" width="${EAN13_LABEL_W}mm" height="${EAN13_LABEL_H}mm">${bg}${labelInner}</svg>`;
+      }
       const labelInner = labelSvgOutlined(data, font).replace('width="100%" height="auto"', `width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}"`);
       const bg = background !== "transparent" ? `<rect x="0" y="0" width="${EXPORT_WIDTH_MM}" height="${EXPORT_HEIGHT_MM}" fill="${background}"/>` : "";
       return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${EXPORT_WIDTH_MM} ${EXPORT_HEIGHT_MM}" width="${EXPORT_WIDTH_MM}mm" height="${EXPORT_HEIGHT_MM}mm" overflow="visible">${bg}<g transform="translate(${EXPORT_MARGIN_MM} ${EXPORT_MARGIN_MM})">${labelInner}</g></svg>`;
     }
     // Build label-only outlined SVG (no margin) for PDF embedding
     function buildOutlinedLabelSVG(data, font, background = "transparent") {
+      if (isEan13Mode(data.gtinLevel)) {
+        const labelInner = labelSvgOutlined(data, font).replace('width="100%" height="auto"', `width="${EAN13_LABEL_W}" height="${EAN13_LABEL_H}"`);
+        const bg = background !== "transparent" ? `<rect x="0" y="0" width="${EAN13_LABEL_W}" height="${EAN13_LABEL_H}" fill="${background}"/>` : "";
+        return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${EAN13_LABEL_W} ${EAN13_LABEL_H}" width="${EAN13_LABEL_W}mm" height="${EAN13_LABEL_H}mm">${bg}${labelInner}</svg>`;
+      }
       const labelInner = labelSvgOutlined(data, font).replace('width="100%" height="auto"', `width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}"`);
       const bg = background !== "transparent" ? `<rect x="0" y="0" width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}" fill="${background}"/>` : "";
       return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${LABEL_WIDTH_MM} ${LABEL_HEIGHT_MM}" width="${LABEL_WIDTH_MM}mm" height="${LABEL_HEIGHT_MM}mm">${bg}${labelInner}</svg>`;
@@ -279,6 +307,7 @@
     let currentBatchPage = 0;
     const byId = (id) => document.getElementById(id);
     const sampleData = { title:"QTM GELVOLUTION 007 HITZ", subtitle:"QUANTUM GELVOLUTION 007 HITZ ASST BLUE 0.7 MM (DM)", thaiName:"ควอนตั้มเจลโวลูชั่น 007 ฮิทซ์น้ำเงินคละสี (DM)", gtin13:"8851907346492", gtinLevel:"3", manualItf14:"38851907345397", location:"IND", qty:"20", grossWeight:"", lotNo:"" };
+    const ean13SampleData = { gtin13: "8851907346522", gtinLevel: "ean13" };
     const batchSampleData = {
       batchTitleList: `QTM WHITEBOARD MARKER
 QTM GELVOLUTION 007 HITZ
@@ -318,7 +347,16 @@ QTM BALL PEN 0.5 MM BLACK`,
     function pageRange(total) { const pageCount = Math.max(1, Math.ceil(total / BATCH_PAGE_SIZE)); currentBatchPage = Math.min(Math.max(currentBatchPage, 0), pageCount - 1); const start = currentBatchPage * BATCH_PAGE_SIZE; const end = Math.min(total, start + BATCH_PAGE_SIZE); return { start, end, pageCount }; }
     function visibleBatch() { const parsed = parseBatchItems(); const range = pageRange(parsed.items.length); return { ...parsed, ...range, selectedItems: parsed.items.slice(range.start, range.end) }; }
     function getPreviewData() { if (currentMode !== "batch") return collectData(); const { items } = parseBatchItems(); batchIndex = Math.min(Math.max(batchIndex, 0), Math.max(0, items.length - 1)); return items[batchIndex] || collectData(); }
-    function makeBaseName(data = getPreviewData()) { let itf = onlyDigits(data.manualItf14); if (itf.length !== 14) { try { itf = getITF14(data).value; } catch (error) { itf = "00000000000000"; } } return `Gtin_Lv${safe(data.gtinLevel)}_${safe(data.subtitle)}_ITF14_${itf}`; }
+    function makeBaseName(data = getPreviewData()) {
+      if (isEan13Mode(data.gtinLevel)) {
+        let ean = onlyDigits(data.gtin13);
+        try { ean = normalizeEAN13(data.gtin13).value; } catch (e) { ean = "0000000000000"; }
+        return `EAN13_${ean}`;
+      }
+      let itf = onlyDigits(data.manualItf14);
+      if (itf.length !== 14) { try { itf = getITF14(data).value; } catch (error) { itf = "00000000000000"; } }
+      return `Gtin_Lv${safe(data.gtinLevel)}_${safe(data.subtitle)}_ITF14_${itf}`;
+    }
     function makeZipName(firstItem, start, end, count, ext) { return `${APP_NAME}_Gtin_Lv${safe(firstItem.gtinLevel)}_${safe(firstItem.subtitle)}_${String(start + 1).padStart(3, "0")}-${String(end).padStart(3, "0")}_x${count}_${ext}.zip`; }
 
     function encodeITF14Rects(value, options = {}) {
@@ -332,12 +370,184 @@ QTM BALL PEN 0.5 MM BLACK`,
       for (const item of sequence) { const width = item.size * unit; if (item.type === "bar") rects += `<rect class="black" x="${cursor.toFixed(2)}" y="${y}" width="${width.toFixed(2)}" height="${height}"/>`; cursor += width; }
       return rects;
     }
+
+    // ============ EAN-13 ENCODING ============
+    const EAN13_L = { "0":"0001101","1":"0011001","2":"0010011","3":"0111101","4":"0100011","5":"0110001","6":"0101111","7":"0111011","8":"0110111","9":"0001011" };
+    const EAN13_G = { "0":"0100111","1":"0110011","2":"0011011","3":"0100001","4":"0011101","5":"0111001","6":"0000101","7":"0010001","8":"0001001","9":"0010111" };
+    const EAN13_R = { "0":"1110010","1":"1100110","2":"1101100","3":"1000010","4":"1011100","5":"1001110","6":"1010000","7":"1000100","8":"1001000","9":"1110100" };
+    const EAN13_PARITY = { "0":"LLLLLL","1":"LLGLGG","2":"LLGGLG","3":"LLGGGL","4":"LGLLGG","5":"LGGLLG","6":"LGGGLL","7":"LGLGLG","8":"LGLGGL","9":"LGGLGL" };
+
+    // Normalize EAN-13 input: if 12 digits, auto-append check digit; if 13, validate.
+    function normalizeEAN13(input) {
+      const digits = onlyDigits(input);
+      if (digits.length === 12) {
+        const cd = calcCheckDigit(digits);
+        return { value: digits + cd, source: "auto", valid: true };
+      }
+      if (digits.length === 13) {
+        const valid = isValidGtin(digits, 13);
+        return { value: digits, source: "manual", valid };
+      }
+      throw new Error("EAN-13 ต้องเป็นเลข 12 หลัก (จะคำนวณ check digit ให้) หรือ 13 หลัก");
+    }
+
+    // Build EAN-13 bit pattern (95 bits total)
+    function ean13Bits(digits) {
+      if (digits.length !== 13) throw new Error("EAN-13 ต้องมี 13 หลัก");
+      const first = digits[0], left = digits.substr(1, 6), right = digits.substr(7, 6);
+      let bits = "101";
+      const par = EAN13_PARITY[first];
+      for (let i = 0; i < 6; i++) bits += par[i] === "L" ? EAN13_L[left[i]] : EAN13_G[left[i]];
+      bits += "01010";
+      for (let i = 0; i < 6; i++) bits += EAN13_R[right[i]];
+      bits += "101";
+      return bits;
+    }
+
+    // Encode EAN-13 to SVG rects with proper guard bar extensions
+    // params: { x, y, height, moduleWidth, guardExtraHeight }
+    function encodeEAN13Rects(digits, options = {}) {
+      const bits = ean13Bits(digits);
+      const x = options.x ?? 0, y = options.y ?? 0;
+      const height = options.height ?? 10;
+      const moduleWidth = options.moduleWidth ?? 0.33;
+      const guardExtra = options.guardExtraHeight ?? 1.0; // guard bars extend below
+
+      // Guard positions (in bit index):
+      // Start guard: bits 0-2 (3 modules)
+      // Center guard: bits 45-49 (5 modules)
+      // End guard: bits 92-94 (3 modules)
+      function isGuard(i) {
+        return (i >= 0 && i <= 2) || (i >= 45 && i <= 49) || (i >= 92 && i <= 94);
+      }
+
+      let rects = "";
+      for (let i = 0; i < bits.length; i++) {
+        if (bits[i] === "1") {
+          const bx = x + i * moduleWidth;
+          const bh = isGuard(i) ? height + guardExtra : height;
+          rects += `<rect class="black" x="${bx.toFixed(3)}" y="${y.toFixed(3)}" width="${moduleWidth.toFixed(3)}" height="${bh.toFixed(3)}"/>`;
+        }
+      }
+      return rects;
+    }
+
+    // Build EAN-13 mini label SVG (barcode + 13-digit text at bottom)
+    // Layout: 70mm wide x 20mm tall
+    // Reference layout: bars centered with first digit ("8") OUTSIDE on left, then "851907" centered under left bars, then "346522" centered under right bars
+    function ean13LabelSvg(data) {
+      // Normalize input
+      let result;
+      try { result = normalizeEAN13(data.gtin13); }
+      catch (error) {
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 20" width="100%" height="auto"><text x="35" y="11" font-family="Arial,Helvetica,sans-serif" font-size="2.5" text-anchor="middle" fill="#888">EAN-13: ${esc(error.message)}</text></svg>`;
+      }
+      const digits = result.value;
+      const g = ean13Geometry();
+      const bars = encodeEAN13Rects(digits, {
+        x: g.barcodeX, y: g.barcodeY, height: g.barcodeH, moduleWidth: g.moduleW, guardExtraHeight: g.guardExtra
+      });
+      // Layout matches reference: 7 digits + 6 digits below bars, NO first digit on left
+      // Group 1 = digits[0..6] = "8851907" (7 chars, right-aligned to center guard)
+      // Group 2 = digits[7..12] = "346522" (6 chars, centered under right bars)
+      const leftGroup = digits.substr(0, 7);
+      const rightGroup = digits.substr(7, 6);
+      // Left group: right-aligned at center guard end (module 50)
+      const leftGroupEndX = g.barcodeX + 44 * g.moduleW;
+      // Right group: centered under right data area (modules 50-91, center at module 70.5)
+      const rightGroupCenterX = g.barcodeX + 70.5 * g.moduleW;
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.labelW} ${g.labelH}" width="100%" height="auto">
+        <style>.black{fill:#231f20}.ean-num{fill:#231f20;font-family:"Arial","Helvetica",sans-serif;font-size:${g.textFontSize}px;font-weight:400;letter-spacing:0.18mm}.ean-num-end{text-anchor:end}.ean-num-mid{text-anchor:middle}</style>
+        ${bars}
+        <text class="ean-num ean-num-end" x="${leftGroupEndX.toFixed(3)}" y="${g.textY.toFixed(3)}">${leftGroup}</text>
+        <text class="ean-num ean-num-mid" x="${rightGroupCenterX.toFixed(3)}" y="${g.textY.toFixed(3)}">${rightGroup}</text>
+      </svg>`;
+    }
+    // Shared geometry for EAN-13 (used by both text and outlined renderers)
+    function ean13Geometry() {
+      const labelW = 70, labelH = 20;
+      const barcodeW = 60;            // mm — wider, with text below
+      const moduleW = barcodeW / 95;  // ~0.632 mm/module
+      const barcodeH = 11;            // mm — slightly shorter so text below has room
+      const guardExtra = 1.5;         // mm — extended guard bars
+      const barcodeX = (labelW - barcodeW) / 2;  // center
+      const barcodeY = 2.5;
+      const textFontSize = 4.2;       // mm — larger font matching reference
+      const textY = barcodeY + barcodeH + guardExtra + 3.6;
+      return { labelW, labelH, barcodeW, moduleW, barcodeH, guardExtra, barcodeX, barcodeY, textFontSize, textY };
+    }
+
+    // Build outlined version of EAN-13 mini label (text → path)
+    function ean13LabelSvgOutlined(data, font) {
+      let result;
+      try { result = normalizeEAN13(data.gtin13); }
+      catch (error) {
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 20" width="100%" height="auto"></svg>`;
+      }
+      const digits = result.value;
+      const g = ean13Geometry();
+      const bars = encodeEAN13Rects(digits, {
+        x: g.barcodeX, y: g.barcodeY, height: g.barcodeH, moduleWidth: g.moduleW, guardExtraHeight: g.guardExtra
+      }).replaceAll('class="black"', 'fill="#231f20"');
+      const leftGroup = digits.substr(0, 7);
+      const rightGroup = digits.substr(7, 6);
+      const leftGroupEndX = g.barcodeX + 44 * g.moduleW;
+      const rightGroupCenterX = g.barcodeX + 70.5 * g.moduleW;
+      // Build outlined paths using embedded font.
+      // Note: embedded font is Angsana New Bold (serif). Reference shows sans-serif but we only have this font.
+      // For digits, the visual difference is minimal at small sizes. The key benefit is no font dependency.
+      function digitPath(text, fontSize, x, y, anchor) {
+        if (!text) return "";
+        const naturalWidth = font.getAdvanceWidth(String(text), fontSize);
+        let dx = 0;
+        if (anchor === "middle") dx = -naturalWidth / 2;
+        else if (anchor === "end") dx = -naturalWidth;
+        const path = font.getPath(String(text), 0, 0, fontSize);
+        return `<path d="${path.toPathData(3)}" transform="translate(${(x + dx).toFixed(3)} ${y.toFixed(3)})" fill="#231f20"/>`;
+      }
+      const leftPath  = digitPath(leftGroup,  g.textFontSize, leftGroupEndX,    g.textY, "end");
+      const rightPath = digitPath(rightGroup, g.textFontSize, rightGroupCenterX, g.textY, "middle");
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.labelW} ${g.labelH}" width="100%" height="auto">${bars}${leftPath}${rightPath}</svg>`;
+    }
+
+    // Helper: check if current mode/data is EAN-13
+    function isEAN13(data) {
+      return String(data && data.gtinLevel) === "ean13";
+    }
+    // EAN-13 label dimensions
+    const EAN13_LABEL_W_MM = 70;
+    const EAN13_LABEL_H_MM = 20;
+    // ============ END EAN-13 ============
     function labelSvg(data) {
+      // Route to EAN-13 mini label when ean13 mode is selected
+      if (isEan13Mode(data.gtinLevel)) {
+        return ean13LabelSvg(data).replace('<svg ', '<svg id="label-svg" ');
+      }
       let itf = { value:"00000000000000", valid:false }, barcodeRects = ""; try { itf = getITF14(data); barcodeRects = encodeITF14Rects(itf.value); } catch (error) {}
       const topBarcodeText = `${onlyDigits(data.gtin13)} x ${esc(data.qty)}`;
       return `<svg id="label-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172.54 123.01" width="100%" height="auto"><defs><style>.black{fill:#231f20}.title,.subtitle,.thai,.bold-small,.barcode-text{fill:#231f20;font-family:"Angsana New Embedded","Angsana New","Times New Roman",serif;font-weight:700}.title{font-size:22.16px;letter-spacing:-.02em}.subtitle{font-size:10.5px;letter-spacing:-.02em}.thai{font-size:9.75px}.small{fill:#231f20;font-family:"Angsana New Embedded","Angsana New","Times New Roman",serif;font-size:11.45px}.bold-small{font-size:11.45px}.table-header{text-anchor:middle}.barcode-text{font-size:13.5px;letter-spacing:.05em}.top-barcode-text{fill:#231f20;font-family:"Angsana New Embedded","Angsana New","Times New Roman",serif;font-size:11.25px;text-anchor:end}.center-title,.center-subtitle,.center-thai{text-anchor:middle;dominant-baseline:alphabetic}.table-value{text-anchor:middle}</style></defs><path class="black" d="M172.54,100.17H0V.95h172.54v99.21ZM.76,99.42h171.02V1.7H.76v97.72Z"/><text class="title center-title" x="86.27" y="15.92" textLength="155" lengthAdjust="spacingAndGlyphs">${esc(data.title)}</text><text class="subtitle center-subtitle" x="86.27" y="25.56" textLength="152" lengthAdjust="spacingAndGlyphs">${esc(data.subtitle)}</text><text class="thai center-thai" x="86.27" y="35.62" textLength="135" lengthAdjust="spacingAndGlyphs">${esc(data.thaiName)}</text><text class="top-barcode-text" x="148.05" y="44.26">${topBarcodeText}</text><path class="black" d="M164.4,66.05H8.14v-19.16h156.26v19.16ZM9.5,64.74h153.55v-16.53H9.5v16.53Z"/><g id="barcode-bars">${barcodeRects}</g><text class="barcode-text" transform="translate(7.49 74.88)">${esc(itf.value)}</text><text class="small table-header" x="31.135" y="84.50">LOCATION</text><text class="small table-header" x="66.025" y="84.50">QTY</text><text class="small table-header" x="98.330" y="84.50">G.W.(Kg)</text><text class="small table-header" x="141.860" y="84.50">LOT NO.</text><path class="black" d="M164.55,93.9H7.71v-16.74h156.84v16.74ZM8.23,93.39h155.78v-15.71H8.23v15.71Z"/><rect class="black" x="54.56" y="77.43" width=".53" height="16.22"/><rect class="black" x="77.49" y="77.43" width=".53" height="16.22"/><rect class="black" x="119.17" y="77.43" width=".53" height="16.22"/><text class="bold-small table-value" x="31.135" y="92.11">${esc(data.location)}</text><text class="bold-small table-value" x="66.025" y="92.11">${esc(data.qty)}</text><text class="bold-small table-value" x="98.330" y="92.11">${esc(data.grossWeight)}</text><text class="bold-small table-value" x="141.860" y="92.11">${esc(data.lotNo)}</text></svg>`;
     }
-    function updateStatus(data) { const status = byId("status"); try { const itf = getITF14(data); status.className = itf.valid ? "status ok" : "status warn"; status.innerHTML = itf.valid ? `<strong>Preview พร้อมใช้งาน</strong>ITF-14: ${esc(itf.value)} (${itf.source === "manual" ? "ใช้เลขที่ใส่เอง" : "สร้างจาก GTIN-13 + Lv" + esc(data.gtinLevel)})` : `<strong>Preview แสดงได้ แต่ควรตรวจสอบ</strong>ITF-14: ${esc(itf.value)} มี check digit ไม่ตรงตามสูตร GTIN`; } catch (error) { status.className = "status bad"; status.innerHTML = `<strong>ตรวจสอบข้อมูล</strong>${esc(error.message)}`; } }
+    function updateStatus(data) {
+      const status = byId("status");
+      // EAN-13 mode: validate / auto-fill 13th digit
+      if (isEan13Mode(data.gtinLevel)) {
+        try {
+          const r = normalizeEAN13(data.gtin13);
+          const msg = r.source === "auto"
+            ? `<strong>Preview พร้อมใช้งาน (EAN-13)</strong>ระบบเติม Check Digit ให้: ${esc(r.value)}`
+            : (r.valid
+                ? `<strong>Preview พร้อมใช้งาน (EAN-13)</strong>EAN-13: ${esc(r.value)} (ใช้เลขที่กรอก)`
+                : `<strong>Preview แสดงได้ แต่ Check Digit ไม่ตรง</strong>EAN-13: ${esc(r.value)} — ควรตรวจสอบ`);
+          status.className = r.valid ? "status ok" : "status warn";
+          status.innerHTML = msg;
+        } catch (error) {
+          status.className = "status bad";
+          status.innerHTML = `<strong>ตรวจสอบข้อมูล (EAN-13)</strong>${esc(error.message)}`;
+        }
+        return;
+      }
+      try { const itf = getITF14(data); status.className = itf.valid ? "status ok" : "status warn"; status.innerHTML = itf.valid ? `<strong>Preview พร้อมใช้งาน</strong>ITF-14: ${esc(itf.value)} (${itf.source === "manual" ? "ใช้เลขที่ใส่เอง" : "สร้างจาก GTIN-13 + Lv" + esc(data.gtinLevel)})` : `<strong>Preview แสดงได้ แต่ควรตรวจสอบ</strong>ITF-14: ${esc(itf.value)} มี check digit ไม่ตรงตามสูตร GTIN`; } catch (error) { status.className = "status bad"; status.innerHTML = `<strong>ตรวจสอบข้อมูล</strong>${esc(error.message)}`; }
+    }
     function renderLabel(data, updateStatusBox = true) { if (updateStatusBox) updateStatus(data); byId("label-container").innerHTML = labelSvg(data); }
     function updateBatchControls() {
       const parsed = parseBatchItems(), total = parsed.items.length, range = pageRange(total), visibleItems = parsed.items.slice(range.start, range.end);
@@ -350,8 +560,38 @@ QTM BALL PEN 0.5 MM BLACK`,
       byId("batchCounts").textContent = `อ่านข้อมูลได้ ${total} รายการ | กำลังแสดง ${range.start + 1}-${range.end} | ${counts}`;
       thumbs.innerHTML = visibleItems.map((item, offset) => { const index = range.start + offset; let itf = onlyDigits(item.manualItf14); if (itf.length !== 14) { try { itf = getITF14(item).value; } catch (error) { itf = "ITF-14 ?"; } } return `<button class="thumb-btn ${index === batchIndex ? "active" : ""}" type="button" onclick="selectBatchItem(${index})">#${index + 1}<span>${esc(item.subtitle)}</span><span>${esc(itf)}</span><span class="pill">QTY ${esc(item.qty)}</span></button>`; }).join("");
     }
-    function update() { updateBatchControls(); renderLabel(getPreviewData()); }
-    function setMode(mode) { currentMode = mode === "batch" ? "batch" : "single"; byId("singleModeBtn").classList.toggle("active", currentMode === "single"); byId("batchModeBtn").classList.toggle("active", currentMode === "batch"); byId("singleFormSection").classList.toggle("hidden", currentMode === "batch"); byId("batchSection").classList.toggle("hidden", currentMode !== "batch"); byId("singleActions").classList.toggle("hidden", currentMode !== "single"); byId("batchActions").classList.toggle("hidden", currentMode !== "batch"); update(); }
+    function updateEan13UI() {
+      // Determine current mode's gtinLevel
+      const isEanSingle = isEan13Mode(byId("gtinLevel").value);
+      const isEanBatch = isEan13Mode(byId("batchGtinLevel").value);
+      // Toggle fields specific to non-EAN13 mode (single form)
+      document.querySelectorAll(".ean13-hide-single").forEach((el) => {
+        el.classList.toggle("hidden", isEanSingle);
+      });
+      // Toggle fields specific to non-EAN13 mode (batch form)
+      document.querySelectorAll(".ean13-hide-batch").forEach((el) => {
+        el.classList.toggle("hidden", isEanBatch);
+      });
+      // Show/hide help text
+      const helpSingle = byId("ean13Help");
+      if (helpSingle) helpSingle.classList.toggle("hidden", !isEanSingle);
+      const helpBatch = byId("ean13HelpBatch");
+      if (helpBatch) helpBatch.classList.toggle("hidden", !isEanBatch);
+    }
+    function update() { updateEan13UI(); updateBatchControls(); renderLabel(getPreviewData()); }
+    function setMode(mode) {
+      currentMode = mode === "batch" ? "batch" : "single";
+      // Sync gtinLevel between single and batch dropdowns
+      if (currentMode === "batch") byId("batchGtinLevel").value = byId("gtinLevel").value;
+      else byId("gtinLevel").value = byId("batchGtinLevel").value;
+      byId("singleModeBtn").classList.toggle("active", currentMode === "single");
+      byId("batchModeBtn").classList.toggle("active", currentMode === "batch");
+      byId("singleFormSection").classList.toggle("hidden", currentMode === "batch");
+      byId("batchSection").classList.toggle("hidden", currentMode !== "batch");
+      byId("singleActions").classList.toggle("hidden", currentMode !== "single");
+      byId("batchActions").classList.toggle("hidden", currentMode !== "batch");
+      update();
+    }
     function selectBatchItem(index) { batchIndex = index; currentBatchPage = Math.floor(batchIndex / BATCH_PAGE_SIZE); update(); }
     function prevBatchItem() { selectBatchItem(Math.max(0, batchIndex - 1)); }
     function nextBatchItem() { const { items } = parseBatchItems(); selectBatchItem(Math.min(items.length - 1, batchIndex + 1)); }
@@ -359,11 +599,48 @@ QTM BALL PEN 0.5 MM BLACK`,
     function nextBatchPage() { const { items } = parseBatchItems(); const maxPage = Math.max(0, Math.ceil(items.length / BATCH_PAGE_SIZE) - 1); currentBatchPage = Math.min(maxPage, currentBatchPage + 1); batchIndex = currentBatchPage * BATCH_PAGE_SIZE; update(); }
     function loadSample() { Object.entries(sampleData).forEach(([key, value]) => { const el = byId(key); if (el) el.value = value; }); batchIndex = 0; currentBatchPage = 0; update(); }
     function loadBatchSample() { Object.entries(batchSampleData).forEach(([key, value]) => { const el = byId(key); if (el) el.value = value; }); byId("batchGtinLevel").value = "4"; batchIndex = 0; currentBatchPage = 0; setMode("batch"); }
+    function loadEan13Sample() {
+      byId("gtin13").value = ean13SampleData.gtin13;
+      byId("gtinLevel").value = "ean13";
+      byId("batchGtinLevel").value = "ean13";
+      batchIndex = 0; currentBatchPage = 0;
+      setMode("single");
+      update();
+    }
     function fillBatchFromCurrentForm() { const data = collectData(); byId("batchTitleList").value = data.title; byId("batchSubtitleList").value = data.subtitle; byId("batchThaiNameList").value = data.thaiName; byId("batchGtin13List").value = data.gtin13; byId("batchItf14List").value = data.manualItf14; byId("batchLocationList").value = data.location; byId("batchQtyList").value = data.qty; byId("batchGrossWeightList").value = data.grossWeight; byId("batchLotNoList").value = data.lotNo; byId("batchGtinLevel").value = data.gtinLevel; batchIndex = 0; currentBatchPage = 0; setMode("batch"); }
 
-    function buildExportSVGSource(data, background = "transparent") { const label = labelSvg(data).replace('width="100%" height="auto"', `width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}"`); const bg = background !== "transparent" ? `<rect x="0" y="0" width="${EXPORT_WIDTH_MM}" height="${EXPORT_HEIGHT_MM}" fill="${background}"/>` : ""; return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${EXPORT_WIDTH_MM} ${EXPORT_HEIGHT_MM}" width="${EXPORT_WIDTH_MM}mm" height="${EXPORT_HEIGHT_MM}mm" overflow="visible">${bg}<g transform="translate(${EXPORT_MARGIN_MM} ${EXPORT_MARGIN_MM})">${label}</g></svg>`; }
+    function buildExportSVGSource(data, background = "transparent") {
+      if (isEan13Mode(data.gtinLevel)) {
+        // EAN-13: minimal layout, no surrounding margin
+        const label = labelSvg(data).replace('width="100%" height="auto"', `width="${EAN13_LABEL_W}" height="${EAN13_LABEL_H}"`);
+        const bg = background !== "transparent" ? `<rect x="0" y="0" width="${EAN13_LABEL_W}" height="${EAN13_LABEL_H}" fill="${background}"/>` : "";
+        return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${EAN13_LABEL_W} ${EAN13_LABEL_H}" width="${EAN13_LABEL_W}mm" height="${EAN13_LABEL_H}mm">${bg}${label}</svg>`;
+      }
+      const label = labelSvg(data).replace('width="100%" height="auto"', `width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}"`); const bg = background !== "transparent" ? `<rect x="0" y="0" width="${EXPORT_WIDTH_MM}" height="${EXPORT_HEIGHT_MM}" fill="${background}"/>` : ""; return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${EXPORT_WIDTH_MM} ${EXPORT_HEIGHT_MM}" width="${EXPORT_WIDTH_MM}mm" height="${EXPORT_HEIGHT_MM}mm" overflow="visible">${bg}<g transform="translate(${EXPORT_MARGIN_MM} ${EXPORT_MARGIN_MM})">${label}</g></svg>`;
+    }
     function getEditableSVGSource(data = getPreviewData()) { return buildExportSVGSource(data); }
-    function svgToCanvas(data, scale = 10, background = "transparent") { return new Promise((resolve, reject) => { const source = buildExportSVGSource(data, background); const canvasWidth = Math.round(EXPORT_WIDTH_MM * scale), canvasHeight = Math.round(EXPORT_HEIGHT_MM * scale); const img = new Image(); img.onload = () => { const canvas = document.createElement("canvas"); canvas.width = canvasWidth; canvas.height = canvasHeight; const ctx = canvas.getContext("2d"); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high"; if (background !== "transparent") { ctx.fillStyle = background; ctx.fillRect(0, 0, canvas.width, canvas.height); } else { ctx.clearRect(0, 0, canvas.width, canvas.height); } ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight); resolve(canvas); }; img.onerror = () => reject(new Error("แปลง Preview เป็นรูปภาพไม่สำเร็จ")); img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(source)))}`; }); }
+    function svgToCanvas(data, scale = 10, background = "transparent") {
+      return new Promise((resolve, reject) => {
+        const source = buildExportSVGSource(data, background);
+        const isEan = isEan13Mode(data.gtinLevel);
+        const exportW = isEan ? EAN13_LABEL_W : EXPORT_WIDTH_MM;
+        const exportH = isEan ? EAN13_LABEL_H : EXPORT_HEIGHT_MM;
+        const canvasWidth = Math.round(exportW * scale), canvasHeight = Math.round(exportH * scale);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = canvasWidth; canvas.height = canvasHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+          if (background !== "transparent") { ctx.fillStyle = background; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+          else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+          ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+          resolve(canvas);
+        };
+        img.onerror = () => reject(new Error("แปลง Preview เป็นรูปภาพไม่สำเร็จ"));
+        img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(source)))}`;
+      });
+    }
     function canvasToBlob(canvas, type, quality) { return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("สร้างไฟล์รูปภาพไม่สำเร็จ")), type, quality)); }
     async function blobToBytes(blob) { return new Uint8Array(await blob.arrayBuffer()); }
     function downloadBlob(blob, filename) { const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = filename; link.click(); URL.revokeObjectURL(url); }
@@ -423,10 +700,13 @@ QTM BALL PEN 0.5 MM BLACK`,
     // Render only the label SVG (172.54 x 123.01) to canvas, no 30mm margin
     function labelSvgToCanvas(data, scale = 12, background = "transparent") {
       return new Promise((resolve, reject) => {
-        const inner = labelSvg(data).replace('width="100%" height="auto"', `width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}"`);
-        const bg = background !== "transparent" ? `<rect x="0" y="0" width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}" fill="${background}"/>` : "";
-        const source = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${LABEL_WIDTH_MM} ${LABEL_HEIGHT_MM}" width="${LABEL_WIDTH_MM}mm" height="${LABEL_HEIGHT_MM}mm">${bg}${inner}</svg>`;
-        const canvasWidth = Math.round(LABEL_WIDTH_MM * scale), canvasHeight = Math.round(LABEL_HEIGHT_MM * scale);
+        const isEan = isEan13Mode(data.gtinLevel);
+        const labelW = isEan ? EAN13_LABEL_W : LABEL_WIDTH_MM;
+        const labelH = isEan ? EAN13_LABEL_H : LABEL_HEIGHT_MM;
+        const inner = labelSvg(data).replace('width="100%" height="auto"', `width="${labelW}" height="${labelH}"`);
+        const bg = background !== "transparent" ? `<rect x="0" y="0" width="${labelW}" height="${labelH}" fill="${background}"/>` : "";
+        const source = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${labelW} ${labelH}" width="${labelW}mm" height="${labelH}mm">${bg}${inner}</svg>`;
+        const canvasWidth = Math.round(labelW * scale), canvasHeight = Math.round(labelH * scale);
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement("canvas");
@@ -460,7 +740,8 @@ QTM BALL PEN 0.5 MM BLACK`,
         const data = getPreviewData();
         const filename = makeBaseName(data);
         const size = getPrintSize(data.gtinLevel);
-        const levelLabel = `Lv${data.gtinLevel}`;
+        const isEan = isEan13Mode(data.gtinLevel);
+        const levelLabel = isEan ? "EAN-13" : `Lv${data.gtinLevel}`;
         status.className = "status ok";
         status.innerHTML = `<strong>กำลังสร้าง Vector PDF...</strong>ขนาด ${size.w} × ${size.h} mm (${levelLabel}) — กำลังโหลดฟอนต์`;
         const font = await loadEmbeddedFont();
@@ -468,7 +749,12 @@ QTM BALL PEN 0.5 MM BLACK`,
         // Build outlined label-only SVG (no margin). PDF page itself is the supplier label size.
         const svgString = buildOutlinedLabelSVG(data, font, "#ffffff");
         const svgElement = svgStringToElement(svgString);
-        const fit = fitContain(LABEL_WIDTH_MM, LABEL_HEIGHT_MM, size.w, size.h, 1);
+        // Use proper source dimensions based on mode
+        const srcW = isEan ? EAN13_LABEL_W : LABEL_WIDTH_MM;
+        const srcH = isEan ? EAN13_LABEL_H : LABEL_HEIGHT_MM;
+        // EAN-13 already matches page exactly — minimal padding. ITF-14 labels get 1mm safe margin.
+        const padding = isEan ? 0.5 : 1;
+        const fit = fitContain(srcW, srcH, size.w, size.h, padding);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({
           orientation: size.w > size.h ? "landscape" : "portrait",
@@ -483,7 +769,7 @@ QTM BALL PEN 0.5 MM BLACK`,
         await pdf.svg(svgElement, { x: fit.x, y: fit.y, width: fit.w, height: fit.h });
         pdf.save(`${filename}_${size.w}x${size.h}mm_outlined.pdf`);
         status.className = "status ok";
-        status.innerHTML = `<strong>Export Vector PDF สำเร็จ</strong>${esc(filename)}_${size.w}x${size.h}mm_outlined.pdf — ตัวอักษรถูกแปลงเป็น vector outline ทั้งหมด ไม่ต้องพึ่งฟอนต์ภายนอก`;
+        status.innerHTML = `<strong>Export Vector PDF สำเร็จ</strong>${esc(filename)}_${size.w}x${size.h}mm_outlined.pdf — ${levelLabel} fit to page, ตัวอักษรเป็น vector outline ทั้งหมด`;
       } catch (error) {
         status.className = "status bad";
         status.innerHTML = `<strong>Export PDF ไม่สำเร็จ</strong>${esc(error.message)} <br>หาก svg2pdf หรือ opentype.js โหลดไม่ได้ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต`;
@@ -538,7 +824,13 @@ QTM BALL PEN 0.5 MM BLACK`,
           compress: true
         });
         // Inner fit rect with 1mm padding inside each cell — keeps tight packing visually clean
-        const fit = fitContain(LABEL_WIDTH_MM, LABEL_HEIGHT_MM, cell.w, cell.h, 1);
+        // Source dimensions depend on mode
+        const isEan = isEan13Mode(firstLevel);
+        const srcW = isEan ? EAN13_LABEL_W : LABEL_WIDTH_MM;
+        const srcH = isEan ? EAN13_LABEL_H : LABEL_HEIGHT_MM;
+        // For EAN-13, label and cell are same size (70×20) — minimal padding so bars don't touch edges
+        const cellPadding = isEan ? 0.3 : 1;
+        const fit = fitContain(srcW, srcH, cell.w, cell.h, cellPadding);
         // Cache outlined SVG element per unique item to avoid re-outlining duplicates
         const svgCache = new Map();
         function getOutlinedSvgElement(item) {
@@ -566,10 +858,11 @@ QTM BALL PEN 0.5 MM BLACK`,
           await new Promise((resolve) => setTimeout(resolve, 0));
         }
         const rangeText = currentMode === "batch" ? `_${String(start + 1).padStart(3, "0")}-${String(end).padStart(3, "0")}` : "";
-        const filename = `${APP_NAME}_PrintSheet_${ps.paper}_${ps.orientation}_Lv${firstLevel}_${cell.w}x${cell.h}mm${rangeText}_x${items.length}_outlined.pdf`;
+        const levelTag = isEan ? "EAN13" : `Lv${firstLevel}`;
+        const filename = `${APP_NAME}_PrintSheet_${ps.paper}_${ps.orientation}_${levelTag}_${cell.w}x${cell.h}mm${rangeText}_x${items.length}_outlined.pdf`;
         pdf.save(filename);
         status.className = "status ok";
-        status.innerHTML = `<strong>Export Vector Print Sheet PDF สำเร็จ</strong>${items.length} ใบ บน ${pageCount} หน้า | ${cols} × ${rows} ใบ/หน้า | Label ${cell.w}×${cell.h} mm (Lv${firstLevel}) — vector outlined ทุกตัวอักษร`;
+        status.innerHTML = `<strong>Export Vector Print Sheet PDF สำเร็จ</strong>${items.length} ใบ บน ${pageCount} หน้า | ${cols} × ${rows} ใบ/หน้า | Label ${cell.w}×${cell.h} mm (${levelTag}) — vector outlined ทุกตัวอักษร`;
       } catch (error) {
         status.className = "status bad";
         status.innerHTML = `<strong>Export Print Sheet PDF ไม่สำเร็จ</strong>${esc(error.message)}`;
@@ -579,7 +872,7 @@ QTM BALL PEN 0.5 MM BLACK`,
     function printCurrentSetSheet() { const status = byId("status"), { selectedItems, start, end } = visibleBatch(); if (!selectedItems.length) { status.className = "status bad"; status.innerHTML = "<strong>Print Sheet ไม่สำเร็จ</strong>ไม่พบข้อมูลสำหรับจัดหน้า"; return; } const ps = paperSize(), gap = Number(byId("printGap").value || 5), cols = Math.max(1, Math.floor((ps.w + gap) / (LABEL_WIDTH_MM + gap))), rows = Math.max(1, Math.floor((ps.h + gap) / (LABEL_HEIGHT_MM + gap))), perPage = Math.max(1, cols * rows), pages = []; for (let i = 0; i < selectedItems.length; i += perPage) pages.push(selectedItems.slice(i, i + perPage)); byId("printSheetRoot").innerHTML = pages.map((page) => `<div class="sheet-page" style="width:${ps.w}mm;height:${ps.h}mm;display:grid;grid-template-columns:repeat(${cols},${LABEL_WIDTH_MM}mm);grid-auto-rows:${LABEL_HEIGHT_MM}mm;gap:${gap}mm;align-content:start;justify-content:start;">${page.map((item) => labelSvg(item).replace('width="100%" height="auto"', `width="${LABEL_WIDTH_MM}mm" height="${LABEL_HEIGHT_MM}mm"`)).join("")}</div>`).join(""); const oldTitle = document.title, rangeText = `${String(start + 1).padStart(3, "0")}-${String(end).padStart(3, "0")}`; document.title = `${APP_NAME}_PrintSheet_${ps.paper}_${ps.orientation}_${rangeText}`; setPrintMode("print-sheet", `@page{size:${ps.paper} ${ps.orientation};margin:0}`); status.className = "status ok"; status.innerHTML = `<strong>Print Sheet พร้อมแล้ว</strong>จัด ${selectedItems.length} รายการบนกระดาษ ${ps.paper} ${ps.orientation === "landscape" ? "แนวนอน" : "แนวตั้ง"} ระยะห่าง ${gap} mm`; setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-sheet"); document.title = oldTitle; }, 500); }, 120); }
 
     document.querySelectorAll("input, select, textarea").forEach((el) => { el.addEventListener("input", update); el.addEventListener("change", update); });
-    Object.assign(window, { setMode, loadSample, loadBatchSample, fillBatchFromCurrentForm, selectBatchItem, prevBatchItem, nextBatchItem, prevBatchPage, nextBatchPage, downloadPNGPreview, downloadJPGPreview, exportSupplierPDF, exportCurrentPreviewPDF, exportPrintSheetPDF, downloadEditableSVG, downloadOutlinedSVG, downloadBatchZip, downloadBatchOutlinedSvgZip, printCurrentSetSheet });
+    Object.assign(window, { setMode, loadSample, loadBatchSample, loadEan13Sample, fillBatchFromCurrentForm, selectBatchItem, prevBatchItem, nextBatchItem, prevBatchPage, nextBatchPage, downloadPNGPreview, downloadJPGPreview, exportSupplierPDF, exportCurrentPreviewPDF, exportPrintSheetPDF, downloadEditableSVG, downloadOutlinedSVG, downloadBatchZip, downloadBatchOutlinedSvgZip, printCurrentSetSheet });
     loadSample();
   </script>
 </body>
