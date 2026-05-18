@@ -85,8 +85,8 @@
         <div class="actions"><button class="btn secondary" type="button" onclick="fillBatchFromCurrentForm()">ใช้ข้อมูลฟอร์มนี้เป็นตัวอย่าง</button><button class="btn ghost" type="button" onclick="loadBatchSample()">ตัวอย่างหลายสินค้า</button></div>
         <div id="batchCounts" class="batch-counts">ยังไม่ได้ใส่ข้อมูลหลายรายการ</div><p id="batchSummary" class="note">ระบบจะแสดงและ Export ทีละชุด ชุดละ 10 รายการ เพื่อลดอาการหน่วงเวลาใช้งานจริง</p>
       </div>
-      <div id="singleActions" class="actions"><button class="btn" type="button" onclick="downloadPNGPreview()">Export PNG Preview</button><button class="btn" type="button" onclick="downloadJPGPreview()">Export JPG Preview</button><button class="btn ghost" type="button" onclick="exportSupplierPDF()">Export Supplier PDF</button><button class="btn ghost" type="button" onclick="downloadEditableSVG()">Export SVG Editable</button></div>
-      <div id="batchActions" class="actions hidden"><button class="btn" type="button" onclick="downloadBatchZip('png')">Export PNG ZIP ชุดนี้</button><button class="btn" type="button" onclick="downloadBatchZip('jpg')">Export JPG ZIP ชุดนี้</button><button class="btn purple" type="button" onclick="downloadBatchZip('svg')">Export SVG ZIP ชุดนี้</button><button class="btn ghost" type="button" onclick="exportCurrentPreviewPDF()">Export PDF Preview นี้</button><button class="btn ghost" type="button" onclick="printCurrentSetSheet()">จัดหน้าสำหรับพิมพ์</button></div>
+      <div id="singleActions" class="actions"><button class="btn" type="button" onclick="downloadPNGPreview()">Export PNG Preview</button><button class="btn" type="button" onclick="downloadJPGPreview()">Export JPG Preview</button><button class="btn ghost" type="button" onclick="exportSupplierPDF()">Export Supplier PDF</button><button class="btn purple" type="button" onclick="exportPrintSheetPDF()">Export PDF for Printing</button><button class="btn ghost" type="button" onclick="downloadEditableSVG()">Export SVG Editable</button></div>
+      <div id="batchActions" class="actions hidden"><button class="btn" type="button" onclick="downloadBatchZip('png')">Export PNG ZIP ชุดนี้</button><button class="btn" type="button" onclick="downloadBatchZip('jpg')">Export JPG ZIP ชุดนี้</button><button class="btn purple" type="button" onclick="downloadBatchZip('svg')">Export SVG ZIP ชุดนี้</button><button class="btn ghost" type="button" onclick="exportCurrentPreviewPDF()">Export PDF Preview นี้</button><button class="btn purple" type="button" onclick="exportPrintSheetPDF()">Export PDF for Printing</button><button class="btn ghost" type="button" onclick="printCurrentSetSheet()">จัดหน้าสำหรับพิมพ์</button></div>
       <div id="status" class="status"></div>
       <div class="privacy-note">Privacy note: เว็บไซต์นี้อาจเก็บข้อมูลการใช้งานแบบไม่ระบุตัวตนเพื่อปรับปรุงประสิทธิภาพและประสบการณ์การใช้งาน เมื่อเปิดใช้ Cloudflare Web Analytics หรือ Plausible ในอนาคต</div>
     </section>
@@ -102,6 +102,20 @@
     const EXPORT_WIDTH_MM = 232.54;
     const EXPORT_HEIGHT_MM = 183.01;
     const BATCH_PAGE_SIZE = 10;
+    // PDF physical print sizes per GTIN Level (mm)
+    const PDF_PRINT_SIZE = {
+      "3": { w: 60,  h: 35 },   // Lv3 → 60 x 35 mm
+      "4": { w: 112, h: 60 }    // Lv4 → 112 x 60 mm
+    };
+    function getPrintSize(level) { return PDF_PRINT_SIZE[String(level)] || PDF_PRINT_SIZE["3"]; }
+    // Compute fit-to-page rectangle preserving aspect ratio (centered, with optional padding)
+    function fitContain(srcW, srcH, dstW, dstH, paddingMm = 0) {
+      const innerW = Math.max(0.1, dstW - paddingMm * 2);
+      const innerH = Math.max(0.1, dstH - paddingMm * 2);
+      const scale = Math.min(innerW / srcW, innerH / srcH);
+      const w = srcW * scale, h = srcH * scale;
+      return { x: (dstW - w) / 2, y: (dstH - h) / 2, w, h, scale };
+    }
     let currentMode = "single";
     let batchIndex = 0;
     let currentBatchPage = 0;
@@ -199,28 +213,53 @@ QTM BALL PEN 0.5 MM BLACK`,
     async function downloadJPGPreview() { try { const canvas = await svgToCanvas(getPreviewData(), 10, "#ffffff"); downloadBlob(await canvasToBlob(canvas, "image/jpeg", .95), `${makeBaseName()}_preview.jpg`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export JPG Preview สำเร็จ</strong>"; } catch (error) { byId("status").className = "status bad"; byId("status").innerHTML = `<strong>Export JPG ไม่สำเร็จ</strong>${esc(error.message)}`; } }
     function downloadEditableSVG() { downloadBlob(new Blob([getEditableSVGSource()], { type:"image/svg+xml;charset=utf-8" }), `${makeBaseName()}_editable.svg`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export SVG Editable สำเร็จ</strong>ใช้สำหรับแก้ไข/debug เท่านั้น"; }
     function setPrintMode(className, pageRule) { document.body.classList.remove("print-label", "print-sheet"); document.body.classList.add(className); byId("printPageStyle").textContent = pageRule; }
+    // Render only the label SVG (172.54 x 123.01) to canvas, no 30mm margin
+    function labelSvgToCanvas(data, scale = 12, background = "transparent") {
+      return new Promise((resolve, reject) => {
+        const inner = labelSvg(data).replace('width="100%" height="auto"', `width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}"`);
+        const bg = background !== "transparent" ? `<rect x="0" y="0" width="${LABEL_WIDTH_MM}" height="${LABEL_HEIGHT_MM}" fill="${background}"/>` : "";
+        const source = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${LABEL_WIDTH_MM} ${LABEL_HEIGHT_MM}" width="${LABEL_WIDTH_MM}mm" height="${LABEL_HEIGHT_MM}mm">${bg}${inner}</svg>`;
+        const canvasWidth = Math.round(LABEL_WIDTH_MM * scale), canvasHeight = Math.round(LABEL_HEIGHT_MM * scale);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = canvasWidth; canvas.height = canvasHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+          if (background !== "transparent") { ctx.fillStyle = background; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+          ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+          resolve(canvas);
+        };
+        img.onerror = () => reject(new Error("แปลง Label เป็นรูปภาพไม่สำเร็จ"));
+        img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(source)))}`;
+      });
+    }
+
     async function exportSupplierPDF() {
       const status = byId("status");
       try {
         const data = getPreviewData();
         const filename = makeBaseName(data);
+        const size = getPrintSize(data.gtinLevel);
+        const levelLabel = `Lv${data.gtinLevel}`;
         status.className = "status ok";
-        status.innerHTML = `<strong>กำลังสร้าง PDF...</strong>กรุณารอสักครู่`;
-        // Render label to high-resolution canvas (white background for clean PDF)
-        const canvas = await svgToCanvas(data, 12, "#ffffff");
+        status.innerHTML = `<strong>กำลังสร้าง PDF...</strong>ขนาด ${size.w} × ${size.h} mm (${levelLabel})`;
+        // Render label to high-res canvas with white background
+        const canvas = await labelSvgToCanvas(data, 14, "#ffffff");
         const imgData = canvas.toDataURL("image/jpeg", 0.95);
-        // Create PDF with same dimensions as EXPORT (232.54 x 183.01 mm) — image fills the page; the margin is already baked into the SVG export
+        // Fit label to page preserving aspect ratio, small 1mm padding for safe margins
+        const fit = fitContain(LABEL_WIDTH_MM, LABEL_HEIGHT_MM, size.w, size.h, 1);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({
-          orientation: EXPORT_WIDTH_MM > EXPORT_HEIGHT_MM ? "landscape" : "portrait",
+          orientation: size.w > size.h ? "landscape" : "portrait",
           unit: "mm",
-          format: [EXPORT_WIDTH_MM, EXPORT_HEIGHT_MM],
+          format: [size.w, size.h],
           compress: true
         });
-        pdf.addImage(imgData, "JPEG", 0, 0, EXPORT_WIDTH_MM, EXPORT_HEIGHT_MM, undefined, "FAST");
-        pdf.save(`${filename}.pdf`);
+        pdf.addImage(imgData, "JPEG", fit.x, fit.y, fit.w, fit.h, undefined, "FAST");
+        pdf.save(`${filename}_${size.w}x${size.h}mm.pdf`);
         status.className = "status ok";
-        status.innerHTML = `<strong>Export PDF สำเร็จ</strong>บันทึกไฟล์: ${esc(filename)}.pdf`;
+        status.innerHTML = `<strong>Export PDF สำเร็จ</strong>${esc(filename)}_${size.w}x${size.h}mm.pdf (${levelLabel} fit to page)`;
       } catch (error) {
         status.className = "status bad";
         status.innerHTML = `<strong>Export PDF ไม่สำเร็จ</strong>${esc(error.message)}`;
@@ -236,10 +275,82 @@ QTM BALL PEN 0.5 MM BLACK`,
     function makeZip(files) { const encoder = new TextEncoder(), localParts = [], centralParts = []; let offset = 0; const stamp = dosDateTime(); for (const file of files) { const nameBytes = encoder.encode(file.name), data = file.data, crc = crc32(data), local = []; push32(local,0x04034b50); push16(local,20); push16(local,0); push16(local,0); push16(local,stamp.time); push16(local,stamp.date); push32(local,crc); push32(local,data.length); push32(local,data.length); push16(local,nameBytes.length); push16(local,0); localParts.push(new Uint8Array(local), nameBytes, data); const central = []; push32(central,0x02014b50); push16(central,20); push16(central,20); push16(central,0); push16(central,0); push16(central,stamp.time); push16(central,stamp.date); push32(central,crc); push32(central,data.length); push32(central,data.length); push16(central,nameBytes.length); push16(central,0); push16(central,0); push16(central,0); push16(central,0); push32(central,0); push32(central,offset); centralParts.push(new Uint8Array(central), nameBytes); offset += local.length + nameBytes.length + data.length; } const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0), end = []; push32(end,0x06054b50); push16(end,0); push16(end,0); push16(end,files.length); push16(end,files.length); push32(end,centralSize); push32(end,offset); push16(end,0); return new Blob([...localParts, ...centralParts, new Uint8Array(end)], { type:"application/zip" }); }
     async function downloadBatchZip(format) { const status = byId("status"), { selectedItems, start, end } = visibleBatch(); if (!selectedItems.length) { status.className = "status bad"; status.innerHTML = "<strong>Export ZIP ไม่สำเร็จ</strong>ไม่พบข้อมูลในชุดนี้"; return; } const ext = format === "jpg" ? "jpg" : format === "svg" ? "svg" : "png", files = [], total = selectedItems.length, padSize = String(end).length; status.className = "status ok"; try { for (let i = 0; i < total; i++) { const item = selectedItems[i], running = String(start + i + 1).padStart(padSize, "0"), itemName = `${makeBaseName(item)}_x${total}_${running}_QTY${safe(item.qty)}.${ext}`; status.innerHTML = `<strong>กำลัง Export ${ext.toUpperCase()} ZIP</strong>กำลังสร้างไฟล์ ${i + 1} / ${total}`; if (format === "svg") { files.push({ name:itemName, data:new TextEncoder().encode(getEditableSVGSource(item)) }); } else { const canvas = await svgToCanvas(item, 10, format === "jpg" ? "#ffffff" : "transparent"); files.push({ name:itemName, data:await blobToBytes(await canvasToBlob(canvas, format === "jpg" ? "image/jpeg" : "image/png", format === "jpg" ? .95 : undefined)) }); } await new Promise((resolve) => setTimeout(resolve, 0)); } downloadBlob(makeZip(files), makeZipName(selectedItems[0], start, end, total, ext)); status.innerHTML = `<strong>Export ${ext.toUpperCase()} ZIP สำเร็จ</strong>สร้างไฟล์ทั้งหมด ${total} ไฟล์เรียบร้อย`; } catch (error) { status.className = "status bad"; status.innerHTML = `<strong>Export ZIP ไม่สำเร็จ</strong>${esc(error.message)}`; } finally { update(); } }
     function paperSize() { const paper = byId("printPaperSize").value, orientation = byId("printOrientation").value, base = paper === "A3" ? { w:297, h:420 } : { w:210, h:297 }; return orientation === "landscape" ? { w:base.h, h:base.w, paper, orientation } : { ...base, paper, orientation }; }
+
+    // Export Print Sheet as PDF (no browser print dialog) — labels sized by GTIN Level, packed tightly (no gap)
+    async function exportPrintSheetPDF() {
+      const status = byId("status");
+      try {
+        // Collect items: in batch mode use current page; in single mode use just the current form
+        let items, start, end;
+        if (currentMode === "batch") {
+          const vb = visibleBatch();
+          items = vb.selectedItems; start = vb.start; end = vb.end;
+        } else {
+          items = [collectData()]; start = 0; end = 1;
+        }
+        if (!items.length) {
+          status.className = "status bad";
+          status.innerHTML = "<strong>Export Print Sheet PDF ไม่สำเร็จ</strong>ไม่พบข้อมูลสำหรับจัดหน้า";
+          return;
+        }
+        const ps = paperSize();
+        // Use GTIN Level from the first item to determine label size on sheet
+        const firstLevel = items[0].gtinLevel || "3";
+        const cell = getPrintSize(firstLevel);
+        // Tight packing — no gap
+        const cols = Math.max(1, Math.floor(ps.w / cell.w));
+        const rows = Math.max(1, Math.floor(ps.h / cell.h));
+        const perPage = cols * rows;
+        const pageCount = Math.ceil(items.length / perPage);
+        status.className = "status ok";
+        status.innerHTML = `<strong>กำลังสร้าง Print Sheet PDF...</strong>${cols} × ${rows} = ${perPage} ใบ/หน้า บน ${ps.paper} ${ps.orientation === "landscape" ? "แนวนอน" : "แนวตั้ง"}`;
+        // Pre-render each unique label to a canvas (cache by serialized data to avoid re-rendering duplicates)
+        const cache = new Map();
+        async function getLabelDataUrl(item) {
+          const key = JSON.stringify(item);
+          if (cache.has(key)) return cache.get(key);
+          const canvas = await labelSvgToCanvas(item, 12, "#ffffff");
+          const url = canvas.toDataURL("image/jpeg", 0.92);
+          cache.set(key, url);
+          return url;
+        }
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: ps.orientation === "landscape" ? "landscape" : "portrait",
+          unit: "mm",
+          format: ps.paper.toLowerCase(),
+          compress: true
+        });
+        // Inner fit rect with 1mm padding inside each cell — keeps tight packing visually clean
+        const fit = fitContain(LABEL_WIDTH_MM, LABEL_HEIGHT_MM, cell.w, cell.h, 1);
+        for (let p = 0; p < pageCount; p++) {
+          if (p > 0) pdf.addPage(ps.paper.toLowerCase(), ps.orientation === "landscape" ? "landscape" : "portrait");
+          const pageItems = items.slice(p * perPage, (p + 1) * perPage);
+          status.innerHTML = `<strong>กำลังสร้าง Print Sheet PDF...</strong>หน้า ${p + 1} / ${pageCount} (${cols} × ${rows} ใบ/หน้า)`;
+          for (let i = 0; i < pageItems.length; i++) {
+            const item = pageItems[i];
+            const col = i % cols, row = Math.floor(i / cols);
+            const cellX = col * cell.w, cellY = row * cell.h;
+            const imgData = await getLabelDataUrl(item);
+            pdf.addImage(imgData, "JPEG", cellX + fit.x, cellY + fit.y, fit.w, fit.h, undefined, "FAST");
+          }
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        }
+        const rangeText = currentMode === "batch" ? `_${String(start + 1).padStart(3, "0")}-${String(end).padStart(3, "0")}` : "";
+        const filename = `${APP_NAME}_PrintSheet_${ps.paper}_${ps.orientation}_Lv${firstLevel}_${cell.w}x${cell.h}mm${rangeText}_x${items.length}.pdf`;
+        pdf.save(filename);
+        status.className = "status ok";
+        status.innerHTML = `<strong>Export Print Sheet PDF สำเร็จ</strong>${items.length} ใบ บน ${pageCount} หน้า | ${cols} × ${rows} ใบ/หน้า | Label ${cell.w}×${cell.h} mm (Lv${firstLevel}) | ${esc(filename)}`;
+      } catch (error) {
+        status.className = "status bad";
+        status.innerHTML = `<strong>Export Print Sheet PDF ไม่สำเร็จ</strong>${esc(error.message)}`;
+      }
+    }
+
     function printCurrentSetSheet() { const status = byId("status"), { selectedItems, start, end } = visibleBatch(); if (!selectedItems.length) { status.className = "status bad"; status.innerHTML = "<strong>Print Sheet ไม่สำเร็จ</strong>ไม่พบข้อมูลสำหรับจัดหน้า"; return; } const ps = paperSize(), gap = Number(byId("printGap").value || 5), cols = Math.max(1, Math.floor((ps.w + gap) / (LABEL_WIDTH_MM + gap))), rows = Math.max(1, Math.floor((ps.h + gap) / (LABEL_HEIGHT_MM + gap))), perPage = Math.max(1, cols * rows), pages = []; for (let i = 0; i < selectedItems.length; i += perPage) pages.push(selectedItems.slice(i, i + perPage)); byId("printSheetRoot").innerHTML = pages.map((page) => `<div class="sheet-page" style="width:${ps.w}mm;height:${ps.h}mm;display:grid;grid-template-columns:repeat(${cols},${LABEL_WIDTH_MM}mm);grid-auto-rows:${LABEL_HEIGHT_MM}mm;gap:${gap}mm;align-content:start;justify-content:start;">${page.map((item) => labelSvg(item).replace('width="100%" height="auto"', `width="${LABEL_WIDTH_MM}mm" height="${LABEL_HEIGHT_MM}mm"`)).join("")}</div>`).join(""); const oldTitle = document.title, rangeText = `${String(start + 1).padStart(3, "0")}-${String(end).padStart(3, "0")}`; document.title = `${APP_NAME}_PrintSheet_${ps.paper}_${ps.orientation}_${rangeText}`; setPrintMode("print-sheet", `@page{size:${ps.paper} ${ps.orientation};margin:0}`); status.className = "status ok"; status.innerHTML = `<strong>Print Sheet พร้อมแล้ว</strong>จัด ${selectedItems.length} รายการบนกระดาษ ${ps.paper} ${ps.orientation === "landscape" ? "แนวนอน" : "แนวตั้ง"} ระยะห่าง ${gap} mm`; setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-sheet"); document.title = oldTitle; }, 500); }, 120); }
 
     document.querySelectorAll("input, select, textarea").forEach((el) => { el.addEventListener("input", update); el.addEventListener("change", update); });
-    Object.assign(window, { setMode, loadSample, loadBatchSample, fillBatchFromCurrentForm, selectBatchItem, prevBatchItem, nextBatchItem, prevBatchPage, nextBatchPage, downloadPNGPreview, downloadJPGPreview, exportSupplierPDF, exportCurrentPreviewPDF, downloadEditableSVG, downloadBatchZip, printCurrentSetSheet });
+    Object.assign(window, { setMode, loadSample, loadBatchSample, fillBatchFromCurrentForm, selectBatchItem, prevBatchItem, nextBatchItem, prevBatchPage, nextBatchPage, downloadPNGPreview, downloadJPGPreview, exportSupplierPDF, exportCurrentPreviewPDF, exportPrintSheetPDF, downloadEditableSVG, downloadBatchZip, printCurrentSetSheet });
     loadSample();
   </script>
 </body>
