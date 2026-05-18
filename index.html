@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SC-BARCODEDZY_BKK_101_VER-1</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style id="printPageStyle">@page { size: 232.54mm 183.01mm; margin: 0; }</style>
   <style>
     :root {
@@ -198,8 +199,34 @@ QTM BALL PEN 0.5 MM BLACK`,
     async function downloadJPGPreview() { try { const canvas = await svgToCanvas(getPreviewData(), 10, "#ffffff"); downloadBlob(await canvasToBlob(canvas, "image/jpeg", .95), `${makeBaseName()}_preview.jpg`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export JPG Preview สำเร็จ</strong>"; } catch (error) { byId("status").className = "status bad"; byId("status").innerHTML = `<strong>Export JPG ไม่สำเร็จ</strong>${esc(error.message)}`; } }
     function downloadEditableSVG() { downloadBlob(new Blob([getEditableSVGSource()], { type:"image/svg+xml;charset=utf-8" }), `${makeBaseName()}_editable.svg`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export SVG Editable สำเร็จ</strong>ใช้สำหรับแก้ไข/debug เท่านั้น"; }
     function setPrintMode(className, pageRule) { document.body.classList.remove("print-label", "print-sheet"); document.body.classList.add(className); byId("printPageStyle").textContent = pageRule; }
-    function exportSupplierPDF() { const oldTitle = document.title; const filename = makeBaseName(); document.title = filename; setPrintMode("print-label", `@page{size:${EXPORT_WIDTH_MM}mm ${EXPORT_HEIGHT_MM}mm;margin:0}`); byId("status").className = "status ok"; byId("status").innerHTML = `<strong>Export Supplier PDF</strong>แนะนำชื่อไฟล์: ${esc(filename)}.pdf`; setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-label"); document.title = oldTitle; }, 500); }, 120); }
-    function exportCurrentPreviewPDF() { exportSupplierPDF(); }
+    async function exportSupplierPDF() {
+      const status = byId("status");
+      try {
+        const data = getPreviewData();
+        const filename = makeBaseName(data);
+        status.className = "status ok";
+        status.innerHTML = `<strong>กำลังสร้าง PDF...</strong>กรุณารอสักครู่`;
+        // Render label to high-resolution canvas (white background for clean PDF)
+        const canvas = await svgToCanvas(data, 12, "#ffffff");
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
+        // Create PDF with same dimensions as EXPORT (232.54 x 183.01 mm) — image fills the page; the margin is already baked into the SVG export
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: EXPORT_WIDTH_MM > EXPORT_HEIGHT_MM ? "landscape" : "portrait",
+          unit: "mm",
+          format: [EXPORT_WIDTH_MM, EXPORT_HEIGHT_MM],
+          compress: true
+        });
+        pdf.addImage(imgData, "JPEG", 0, 0, EXPORT_WIDTH_MM, EXPORT_HEIGHT_MM, undefined, "FAST");
+        pdf.save(`${filename}.pdf`);
+        status.className = "status ok";
+        status.innerHTML = `<strong>Export PDF สำเร็จ</strong>บันทึกไฟล์: ${esc(filename)}.pdf`;
+      } catch (error) {
+        status.className = "status bad";
+        status.innerHTML = `<strong>Export PDF ไม่สำเร็จ</strong>${esc(error.message)}`;
+      }
+    }
+    function exportCurrentPreviewPDF() { return exportSupplierPDF(); }
 
     const crcTable = (() => { const table = new Uint32Array(256); for (let i = 0; i < 256; i++) { let c = i; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; table[i] = c >>> 0; } return table; })();
     function crc32(data) { let crc = 0xffffffff; for (let i = 0; i < data.length; i++) crc = crcTable[(crc ^ data[i]) & 0xff] ^ (crc >>> 8); return (crc ^ 0xffffffff) >>> 0; }
