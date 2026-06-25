@@ -415,18 +415,22 @@ QTM BALL PEN 0.5 MM BLACK`,
     function pageRange(total) { const pageCount = Math.max(1, Math.ceil(total / BATCH_PAGE_SIZE)); currentBatchPage = Math.min(Math.max(currentBatchPage, 0), pageCount - 1); const start = currentBatchPage * BATCH_PAGE_SIZE; const end = Math.min(total, start + BATCH_PAGE_SIZE); return { start, end, pageCount }; }
     function visibleBatch() { const parsed = parseBatchItems(); const range = pageRange(parsed.items.length); return { ...parsed, ...range, selectedItems: parsed.items.slice(range.start, range.end) }; }
     function getPreviewData() { if (currentMode !== "batch") return collectData(); const { items } = parseBatchItems(); batchIndex = Math.min(Math.max(batchIndex, 0), Math.max(0, items.length - 1)); return items[batchIndex] || collectData(); }
-    // Short file names (≤60 chars) to avoid ZIP extraction errors on Windows.
-    // Format keeps full product code (GTIN-13) + product name (subtitle, truncated) + level.
-    function gtinFull(data) {
-      const g = onlyDigits(data.gtin13);
-      if (g.length >= 13) return g.slice(0, 13);
-      if (g.length > 0) return g;
-      // fallback to ITF-14 if gtin13 missing
+    // Short file names (≤70 chars) to avoid ZIP extraction errors on Windows.
+    // Lead code = the actual barcode number for that level:
+    //   Lv2/Lv3/Lv4 → ITF-14 (14 digits, indicator-prefixed)
+    //   EAN-13 / EAN-13 TH/EN → GTIN-13 / EAN-13 (13 digits)
+    function codeForName(data) {
+      if (isEan13Mode(data.gtinLevel)) {
+        let ean = onlyDigits(data.gtin13);
+        try { ean = normalizeEAN13(data.gtin13).value; } catch (e) {}
+        return ean || "0000000000000";
+      }
+      // GTIN levels → ITF-14
       let itf = onlyDigits(data.manualItf14);
-      if (itf.length !== 14) { try { itf = getITF14(data).value; } catch (e) { itf = "0000000000000"; } }
+      if (itf.length !== 14) { try { itf = getITF14(data).value; } catch (e) { itf = "00000000000000"; } }
       return itf;
     }
-    function shortSubtitle(data, maxLen = 20) {
+    function shortSubtitle(data, maxLen = 28) {
       const s = safe(data.subtitle || "");
       return s.slice(0, maxLen).replace(/_+$/, "");
     }
@@ -436,13 +440,13 @@ QTM BALL PEN 0.5 MM BLACK`,
       return `Lv${safe(data.gtinLevel)}`;
     }
     function makeBaseName(data = getPreviewData()) {
-      // EAN-13 modes: code + tag (no subtitle needed for barcode-only)
+      // EAN-13 barcode-only: code + tag (no subtitle)
       if (isEan13Mode(data.gtinLevel) && !isEan13ThenMode(data.gtinLevel)) {
-        return `${gtinFull(data)}_EAN13`;
+        return `${codeForName(data)}_EAN13`;
       }
       // EAN-13 TH/EN + all GTIN levels: code + short product name + level tag
       const sub = shortSubtitle(data);
-      const base = sub ? `${gtinFull(data)}_${sub}_${levelTag(data)}` : `${gtinFull(data)}_${levelTag(data)}`;
+      const base = sub ? `${codeForName(data)}_${sub}_${levelTag(data)}` : `${codeForName(data)}_${levelTag(data)}`;
       return base;
     }
     function makeZipName(firstItem, start, end, count, ext) {
