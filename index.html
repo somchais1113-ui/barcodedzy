@@ -415,17 +415,39 @@ QTM BALL PEN 0.5 MM BLACK`,
     function pageRange(total) { const pageCount = Math.max(1, Math.ceil(total / BATCH_PAGE_SIZE)); currentBatchPage = Math.min(Math.max(currentBatchPage, 0), pageCount - 1); const start = currentBatchPage * BATCH_PAGE_SIZE; const end = Math.min(total, start + BATCH_PAGE_SIZE); return { start, end, pageCount }; }
     function visibleBatch() { const parsed = parseBatchItems(); const range = pageRange(parsed.items.length); return { ...parsed, ...range, selectedItems: parsed.items.slice(range.start, range.end) }; }
     function getPreviewData() { if (currentMode !== "batch") return collectData(); const { items } = parseBatchItems(); batchIndex = Math.min(Math.max(batchIndex, 0), Math.max(0, items.length - 1)); return items[batchIndex] || collectData(); }
-    function makeBaseName(data = getPreviewData()) {
-      if (isEan13Mode(data.gtinLevel)) {
-        let ean = onlyDigits(data.gtin13);
-        try { ean = normalizeEAN13(data.gtin13).value; } catch (e) { ean = "0000000000000"; }
-        return `EAN13_${ean}`;
-      }
+    // Short file names (≤60 chars) to avoid ZIP extraction errors on Windows.
+    // Format keeps product code (first 6 digits of GTIN) + product name (subtitle, truncated) + level.
+    function gtin6Of(data) {
+      const g = onlyDigits(data.gtin13);
+      if (g.length >= 6) return g.slice(0, 6);
+      // fallback to ITF-14 first 6 if gtin13 missing
       let itf = onlyDigits(data.manualItf14);
-      if (itf.length !== 14) { try { itf = getITF14(data).value; } catch (error) { itf = "00000000000000"; } }
-      return `Gtin_Lv${safe(data.gtinLevel)}_${safe(data.subtitle)}_ITF14_${itf}`;
+      if (itf.length !== 14) { try { itf = getITF14(data).value; } catch (e) { itf = "000000000000"; } }
+      return itf.slice(0, 6);
     }
-    function makeZipName(firstItem, start, end, count, ext) { return `${APP_NAME}_Gtin_Lv${safe(firstItem.gtinLevel)}_${safe(firstItem.subtitle)}_${String(start + 1).padStart(3, "0")}-${String(end).padStart(3, "0")}_x${count}_${ext}.zip`; }
+    function shortSubtitle(data, maxLen = 24) {
+      const s = safe(data.subtitle || "");
+      return s.slice(0, maxLen).replace(/_+$/, "");
+    }
+    function levelTag(data) {
+      if (isEan13ThenMode(data.gtinLevel)) return "EAN13TH";
+      if (isEan13Mode(data.gtinLevel)) return "EAN13";
+      return `Lv${safe(data.gtinLevel)}`;
+    }
+    function makeBaseName(data = getPreviewData()) {
+      // EAN-13 modes: code + tag (no subtitle needed for barcode-only)
+      if (isEan13Mode(data.gtinLevel) && !isEan13ThenMode(data.gtinLevel)) {
+        return `${gtin6Of(data)}_EAN13`;
+      }
+      // EAN-13 TH/EN + all GTIN levels: code + short product name + level tag
+      const sub = shortSubtitle(data);
+      const base = sub ? `${gtin6Of(data)}_${sub}_${levelTag(data)}` : `${gtin6Of(data)}_${levelTag(data)}`;
+      return base;
+    }
+    function makeZipName(firstItem, start, end, count, ext) {
+      const range = `${String(start + 1).padStart(3, "0")}-${String(end).padStart(3, "0")}`;
+      return `${makeBaseName(firstItem)}_X${count}_${range}.zip`;
+    }
 
     function encodeITF14Rects(value, options = {}) {
       const digits = onlyDigits(value); if (digits.length !== 14) throw new Error("ITF-14 ต้องมี 14 หลัก");
@@ -905,9 +927,9 @@ QTM BALL PEN 0.5 MM BLACK`,
     function canvasToBlob(canvas, type, quality) { return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("สร้างไฟล์รูปภาพไม่สำเร็จ")), type, quality)); }
     async function blobToBytes(blob) { return new Uint8Array(await blob.arrayBuffer()); }
     function downloadBlob(blob, filename) { const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = filename; link.click(); URL.revokeObjectURL(url); }
-    async function downloadPNGPreview() { try { const canvas = await svgToCanvas(getPreviewData(), 10); downloadBlob(await canvasToBlob(canvas, "image/png"), `${makeBaseName()}_preview.png`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export PNG Preview สำเร็จ</strong>"; } catch (error) { byId("status").className = "status bad"; byId("status").innerHTML = `<strong>Export PNG ไม่สำเร็จ</strong>${esc(error.message)}`; } }
-    async function downloadJPGPreview() { try { const canvas = await svgToCanvas(getPreviewData(), 10, "#ffffff"); downloadBlob(await canvasToBlob(canvas, "image/jpeg", .95), `${makeBaseName()}_preview.jpg`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export JPG Preview สำเร็จ</strong>"; } catch (error) { byId("status").className = "status bad"; byId("status").innerHTML = `<strong>Export JPG ไม่สำเร็จ</strong>${esc(error.message)}`; } }
-    function downloadEditableSVG() { downloadBlob(new Blob([getEditableSVGSource()], { type:"image/svg+xml;charset=utf-8" }), `${makeBaseName()}_editable.svg`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export SVG Editable สำเร็จ</strong>ใช้สำหรับแก้ไข/debug เท่านั้น"; }
+    async function downloadPNGPreview() { try { const canvas = await svgToCanvas(getPreviewData(), 10); downloadBlob(await canvasToBlob(canvas, "image/png"), `${makeBaseName()}_P.png`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export PNG Preview สำเร็จ</strong>"; } catch (error) { byId("status").className = "status bad"; byId("status").innerHTML = `<strong>Export PNG ไม่สำเร็จ</strong>${esc(error.message)}`; } }
+    async function downloadJPGPreview() { try { const canvas = await svgToCanvas(getPreviewData(), 10, "#ffffff"); downloadBlob(await canvasToBlob(canvas, "image/jpeg", .95), `${makeBaseName()}_P.jpg`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export JPG Preview สำเร็จ</strong>"; } catch (error) { byId("status").className = "status bad"; byId("status").innerHTML = `<strong>Export JPG ไม่สำเร็จ</strong>${esc(error.message)}`; } }
+    function downloadEditableSVG() { downloadBlob(new Blob([getEditableSVGSource()], { type:"image/svg+xml;charset=utf-8" }), `${makeBaseName()}_E.svg`); byId("status").className = "status ok"; byId("status").innerHTML = "<strong>Export SVG Editable สำเร็จ</strong>ใช้สำหรับแก้ไข/debug เท่านั้น"; }
     async function downloadOutlinedSVG() {
       const status = byId("status");
       try {
@@ -919,7 +941,7 @@ QTM BALL PEN 0.5 MM BLACK`,
         status.innerHTML = "<strong>กำลังสร้าง SVG Outlined...</strong>กำลังแปลงตัวอักษรเป็น vector path";
         const data = getPreviewData();
         const svgSource = buildOutlinedExportSVG(data, font);
-        downloadBlob(new Blob([svgSource], { type: "image/svg+xml;charset=utf-8" }), `${makeBaseName(data)}_outlined.svg`);
+        downloadBlob(new Blob([svgSource], { type: "image/svg+xml;charset=utf-8" }), `${makeBaseName(data)}_O.svg`);
         status.className = "status ok";
         status.innerHTML = `<strong>Export SVG Outlined สำเร็จ</strong>${esc(makeBaseName(data))}_outlined.svg — ตัวอักษรเป็น vector path ทั้งหมด ไม่ต้องพึ่งฟอนต์ภายนอก`;
       } catch (error) {
@@ -946,7 +968,7 @@ QTM BALL PEN 0.5 MM BLACK`,
         for (let i = 0; i < total; i++) {
           const item = selectedItems[i];
           const running = String(start + i + 1).padStart(padSize, "0");
-          const itemName = `${makeBaseName(item)}_x${total}_${running}_QTY${safe(item.qty)}_outlined.svg`;
+          const itemName = `${makeBaseName(item)}_X${total}_Q${safe(item.qty)}_${running}_O.svg`;
           status.innerHTML = `<strong>กำลังสร้าง SVG Outlined ZIP...</strong>กำลังสร้างไฟล์ ${i + 1} / ${total}`;
           const svgSource = buildOutlinedExportSVG(item, font);
           files.push({ name: itemName, data: new TextEncoder().encode(svgSource) });
@@ -1035,9 +1057,9 @@ QTM BALL PEN 0.5 MM BLACK`,
         pdf.rect(0, 0, size.w, size.h, "F");
         // Render SVG as vector
         await pdf.svg(svgElement, { x: fit.x, y: fit.y, width: fit.w, height: fit.h });
-        pdf.save(`${filename}_${size.w}x${size.h}mm_outlined.pdf`);
+        pdf.save(`${filename}_O.pdf`);
         status.className = "status ok";
-        status.innerHTML = `<strong>Export Vector PDF สำเร็จ</strong>${esc(filename)}_${size.w}x${size.h}mm_outlined.pdf — ${levelLabel} fit to page, ตัวอักษรเป็น vector outline ทั้งหมด`;
+        status.innerHTML = `<strong>Export Vector PDF สำเร็จ</strong>${esc(filename)}_O.pdf — ${levelLabel} ${size.w}×${size.h}mm fit to page, vector outline`;
       } catch (error) {
         status.className = "status bad";
         status.innerHTML = `<strong>Export PDF ไม่สำเร็จ</strong>${esc(error.message)} <br>หาก svg2pdf หรือ opentype.js โหลดไม่ได้ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต`;
@@ -1051,7 +1073,7 @@ QTM BALL PEN 0.5 MM BLACK`,
     function push32(out, value) { out.push(value & 0xff, (value >>> 8) & 0xff, (value >>> 16) & 0xff, (value >>> 24) & 0xff); }
     function dosDateTime(date = new Date()) { return { time:(date.getHours()<<11)|(date.getMinutes()<<5)|Math.floor(date.getSeconds()/2), date:((date.getFullYear()-1980)<<9)|((date.getMonth()+1)<<5)|date.getDate() }; }
     function makeZip(files) { const encoder = new TextEncoder(), localParts = [], centralParts = []; let offset = 0; const stamp = dosDateTime(); for (const file of files) { const nameBytes = encoder.encode(file.name), data = file.data, crc = crc32(data), local = []; push32(local,0x04034b50); push16(local,20); push16(local,0); push16(local,0); push16(local,stamp.time); push16(local,stamp.date); push32(local,crc); push32(local,data.length); push32(local,data.length); push16(local,nameBytes.length); push16(local,0); localParts.push(new Uint8Array(local), nameBytes, data); const central = []; push32(central,0x02014b50); push16(central,20); push16(central,20); push16(central,0); push16(central,0); push16(central,stamp.time); push16(central,stamp.date); push32(central,crc); push32(central,data.length); push32(central,data.length); push16(central,nameBytes.length); push16(central,0); push16(central,0); push16(central,0); push16(central,0); push32(central,0); push32(central,offset); centralParts.push(new Uint8Array(central), nameBytes); offset += local.length + nameBytes.length + data.length; } const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0), end = []; push32(end,0x06054b50); push16(end,0); push16(end,0); push16(end,files.length); push16(end,files.length); push32(end,centralSize); push32(end,offset); push16(end,0); return new Blob([...localParts, ...centralParts, new Uint8Array(end)], { type:"application/zip" }); }
-    async function downloadBatchZip(format) { const status = byId("status"), { selectedItems, start, end } = visibleBatch(); if (!selectedItems.length) { status.className = "status bad"; status.innerHTML = "<strong>Export ZIP ไม่สำเร็จ</strong>ไม่พบข้อมูลในชุดนี้"; return; } const ext = format === "jpg" ? "jpg" : format === "svg" ? "svg" : "png", files = [], total = selectedItems.length, padSize = String(end).length; status.className = "status ok"; try { for (let i = 0; i < total; i++) { const item = selectedItems[i], running = String(start + i + 1).padStart(padSize, "0"), itemName = `${makeBaseName(item)}_x${total}_${running}_QTY${safe(item.qty)}.${ext}`; status.innerHTML = `<strong>กำลัง Export ${ext.toUpperCase()} ZIP</strong>กำลังสร้างไฟล์ ${i + 1} / ${total}`; if (format === "svg") { files.push({ name:itemName, data:new TextEncoder().encode(getEditableSVGSource(item)) }); } else { const canvas = await svgToCanvas(item, 10, format === "jpg" ? "#ffffff" : "transparent"); files.push({ name:itemName, data:await blobToBytes(await canvasToBlob(canvas, format === "jpg" ? "image/jpeg" : "image/png", format === "jpg" ? .95 : undefined)) }); } await new Promise((resolve) => setTimeout(resolve, 0)); } downloadBlob(makeZip(files), makeZipName(selectedItems[0], start, end, total, ext)); status.innerHTML = `<strong>Export ${ext.toUpperCase()} ZIP สำเร็จ</strong>สร้างไฟล์ทั้งหมด ${total} ไฟล์เรียบร้อย`; } catch (error) { status.className = "status bad"; status.innerHTML = `<strong>Export ZIP ไม่สำเร็จ</strong>${esc(error.message)}`; } finally { update(); } }
+    async function downloadBatchZip(format) { const status = byId("status"), { selectedItems, start, end } = visibleBatch(); if (!selectedItems.length) { status.className = "status bad"; status.innerHTML = "<strong>Export ZIP ไม่สำเร็จ</strong>ไม่พบข้อมูลในชุดนี้"; return; } const ext = format === "jpg" ? "jpg" : format === "svg" ? "svg" : "png", files = [], total = selectedItems.length, padSize = String(end).length; status.className = "status ok"; try { for (let i = 0; i < total; i++) { const item = selectedItems[i], running = String(start + i + 1).padStart(padSize, "0"), itemName = `${makeBaseName(item)}_X${total}_Q${safe(item.qty)}_${running}.${ext}`; status.innerHTML = `<strong>กำลัง Export ${ext.toUpperCase()} ZIP</strong>กำลังสร้างไฟล์ ${i + 1} / ${total}`; if (format === "svg") { files.push({ name:itemName, data:new TextEncoder().encode(getEditableSVGSource(item)) }); } else { const canvas = await svgToCanvas(item, 10, format === "jpg" ? "#ffffff" : "transparent"); files.push({ name:itemName, data:await blobToBytes(await canvasToBlob(canvas, format === "jpg" ? "image/jpeg" : "image/png", format === "jpg" ? .95 : undefined)) }); } await new Promise((resolve) => setTimeout(resolve, 0)); } downloadBlob(makeZip(files), makeZipName(selectedItems[0], start, end, total, ext)); status.innerHTML = `<strong>Export ${ext.toUpperCase()} ZIP สำเร็จ</strong>สร้างไฟล์ทั้งหมด ${total} ไฟล์เรียบร้อย`; } catch (error) { status.className = "status bad"; status.innerHTML = `<strong>Export ZIP ไม่สำเร็จ</strong>${esc(error.message)}`; } finally { update(); } }
     function paperSize() { const paper = byId("printPaperSize").value, orientation = byId("printOrientation").value, base = paper === "A3" ? { w:297, h:420 } : { w:210, h:297 }; return orientation === "landscape" ? { w:base.h, h:base.w, paper, orientation } : { ...base, paper, orientation }; }
 
     // Export Print Sheet as VECTOR PDF (no browser print dialog) — labels sized by GTIN Level, packed tightly (no gap)
@@ -1128,11 +1150,11 @@ QTM BALL PEN 0.5 MM BLACK`,
           await new Promise((resolve) => setTimeout(resolve, 0));
         }
         const rangeText = currentMode === "batch" ? `_${String(start + 1).padStart(3, "0")}-${String(end).padStart(3, "0")}` : "";
-        const levelTag = isEan ? "EAN13" : `Lv${firstLevel}`;
-        const filename = `${APP_NAME}_PrintSheet_${ps.paper}_${ps.orientation}_${levelTag}_${cell.w}x${cell.h}mm${rangeText}_x${items.length}_outlined.pdf`;
+        const lvTag = isEan ? "EAN13" : `Lv${firstLevel}`;
+        const filename = `Sheet_${ps.paper}_${lvTag}_${cell.w}x${cell.h}${rangeText}_X${items.length}.pdf`;
         pdf.save(filename);
         status.className = "status ok";
-        status.innerHTML = `<strong>Export Vector Print Sheet PDF สำเร็จ</strong>${items.length} ใบ บน ${pageCount} หน้า | ${cols} × ${rows} ใบ/หน้า | Label ${cell.w}×${cell.h} mm (${levelTag}) — vector outlined ทุกตัวอักษร`;
+        status.innerHTML = `<strong>Export Vector Print Sheet PDF สำเร็จ</strong>${items.length} ใบ บน ${pageCount} หน้า | ${cols} × ${rows} ใบ/หน้า | Label ${cell.w}×${cell.h} mm (${lvTag}) — vector outlined ทุกตัวอักษร`;
       } catch (error) {
         status.className = "status bad";
         status.innerHTML = `<strong>Export Print Sheet PDF ไม่สำเร็จ</strong>${esc(error.message)}`;
