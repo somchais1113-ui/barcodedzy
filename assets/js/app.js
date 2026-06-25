@@ -401,7 +401,7 @@
   }
 
   function safeFilename(value) {
-    return String(value || "barcode").trim().replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "barcode";
+    return String(value || "barcode").trim().replace(/[^a-z0-9_-]+/gi, "_").replace(/^[_-]+|[_-]+$/g, "").slice(0, 31) || "barcode";
   }
 
   function getSerializedSvg() {
